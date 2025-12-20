@@ -16,7 +16,7 @@ export const buildApp = async () => {
 
   // Register plugins
   await fastify.register(cors, {
-    origin: env.FRONTEND_URL,
+    origin: [env.FRONTEND_URL, 'https://tracker-frontend.fly.dev'],
     credentials: true,
   });
 

@@ -24,6 +24,9 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 fastify
@@ -34,12 +37,18 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
+# Create data directory for SQLite (Fly.io volume mount)
+RUN mkdir -p /data && chown -R fastify:nodejs /data
+
 # Change ownership
 RUN chown -R fastify:nodejs /app
 
 USER fastify
 
-EXPOSE 3001
+# Fly.io uses port 8080 by default
+ENV PORT=8080
+EXPOSE 8080
 
-CMD ["npm", "start"]
+# Run migrations and start server
+CMD ["dumb-init", "sh", "-c", "npx prisma migrate deploy && npm start"]
 
