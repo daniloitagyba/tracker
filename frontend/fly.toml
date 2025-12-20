@@ -1,12 +1,12 @@
-# Fly.io configuration for Tracker Frontend
+# fly.toml app configuration file generated for tracker-front-k8nyza on 2025-12-20T18:35:39Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
 app = 'tracker-front-k8nyza'
 primary_region = 'gru'
 
 [build]
-  dockerfile = 'Dockerfile'
-  [build.args]
-    VITE_API_URL = 'https://tracker-api-yhorca.fly.dev'
 
 [http_service]
   internal_port = 8080
