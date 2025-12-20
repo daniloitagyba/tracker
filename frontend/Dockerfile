@@ -10,7 +10,7 @@ ARG VITE_API_URL=https://tracker-backend.fly.dev
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .

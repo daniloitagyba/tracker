@@ -1,38 +1,39 @@
-# Fly.io configuration for Tracker Backend
-# Deploy with: fly deploy --config backend/fly.toml
+# fly.toml app configuration file generated for tracker-backend-icy-glitter-4734 on 2025-12-20T14:15:06-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "tracker-backend"
-primary_region = "gru"  # São Paulo, Brazil
+app = 'tracker-backend-icy-glitter-4734'
+primary_region = 'gru'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
 
 [env]
-  NODE_ENV = "production"
-  PORT = "8080"
-  DATABASE_URL = "file:/data/tracker.db"
+  DATABASE_URL = 'file:/data/tracker.db'
+  NODE_ENV = 'production'
+  PORT = '8080'
+
+[[mounts]]
+  source = 'tracker_data'
+  destination = '/data'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
-[[http_service.checks]]
-  grace_period = "10s"
-  interval = "30s"
-  method = "GET"
-  path = "/health"
-  timeout = "5s"
-
-[mounts]
-  source = "tracker_data"
-  destination = "/data"
+  [[http_service.checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/health'
 
 [[vm]]
-  cpu_kind = "shared"
+  memory = '256mb'
   cpus = 1
   memory_mb = 256
-

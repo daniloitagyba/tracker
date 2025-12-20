@@ -50,3 +50,5 @@ prisma/*.db
 *.local
 .cache/
 
+scripts/deploy.sh
+scripts/deploy.sh
