@@ -8,6 +8,10 @@ primary_region = 'iad'
 
 [build]
 
+[env]
+  # Variáveis não-sensíveis
+  VITE_API_URL = 'VITE_API_URL'
+
 [http_service]
   internal_port = 8080
   force_https = true
