@@ -1,4 +1,4 @@
-import { Box, Typography, IconButton } from '@mui/material';
+import { Box, Typography, IconButton, useMediaQuery, useTheme } from '@mui/material';
 import LocalShippingRoundedIcon from '@mui/icons-material/LocalShippingRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
@@ -52,6 +52,9 @@ const formatTimeAgo = (dateString?: string | null): string | null => {
 };
 
 export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   // Determine status based on isDelivered or fallback
   const status: PackageStatus = pkg.isDelivered ? 'delivered' : (pkg.status || 'in_transit');
   const config = statusConfig[status] || statusConfig.in_transit;
@@ -64,8 +67,8 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
       sx={{
         display: 'flex',
         alignItems: 'center',
-        gap: 2,
-        p: 2.5,
+        gap: { xs: 1.5, sm: 2 },
+        p: { xs: 2, sm: 2.5 },
         backgroundColor: 'background.paper',
         borderRadius: 3,
         border: '1px solid',
@@ -78,11 +81,15 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
           transform: 'translateX(4px)',
           borderColor: 'rgba(255, 255, 255, 0.12)',
         } : {},
+        '&:active': onClick && isMobile ? {
+          transform: 'scale(0.98)',
+          backgroundColor: 'action.hover',
+        } : {},
       }}
     >
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography
-          variant="h6"
+          variant={isMobile ? 'subtitle1' : 'h6'}
           sx={{
             fontWeight: 600,
             color: 'text.primary',
@@ -90,6 +97,7 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
+            fontSize: { xs: '0.95rem', sm: '1.125rem' },
           }}
         >
           {pkg.description}
@@ -103,13 +111,17 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
             mb: 1,
           }}
         >
-          <LanguageRoundedIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+          <LanguageRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 }, color: 'text.secondary' }} />
           <Typography
             variant="body2"
             sx={{
               fontFamily: '"JetBrains Mono", monospace',
               color: 'text.secondary',
               letterSpacing: '0.5px',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
             {pkg.trackingCode}
@@ -132,6 +144,7 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
               }}
             >
               ↳ {pkg.lastStatus}
@@ -149,11 +162,15 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
         >
           {pkg.lastLocation ? (
             <>
-              <PlaceRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+              <PlaceRoundedIcon sx={{ fontSize: { xs: 12, sm: 14 }, color: 'text.secondary' }} />
               <Typography
                 variant="caption"
                 sx={{
                   color: 'text.secondary',
+                  fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {pkg.lastLocation}
@@ -162,11 +179,12 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
             </>
           ) : timeAgo ? (
             <>
-              <AccessTimeRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+              <AccessTimeRoundedIcon sx={{ fontSize: { xs: 12, sm: 14 }, color: 'text.secondary' }} />
               <Typography
                 variant="caption"
                 sx={{
                   color: 'text.secondary',
+                  fontSize: { xs: '0.65rem', sm: '0.75rem' },
                 }}
               >
                 {timeAgo}
@@ -178,6 +196,7 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
               sx={{
                 color: 'text.secondary',
                 fontStyle: 'italic',
+                fontSize: { xs: '0.65rem', sm: '0.75rem' },
               }}
             >
               Clique para rastrear
@@ -190,25 +209,28 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 1,
+          gap: { xs: 0.5, sm: 1 },
         }}
       >
         <Box
           sx={{
-            width: 48,
-            height: 48,
+            width: { xs: 40, sm: 48 },
+            height: { xs: 40, sm: 48 },
             borderRadius: 2,
             backgroundColor: config.bgColor,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: config.color,
+            '& svg': {
+              fontSize: { xs: 20, sm: 24 },
+            },
           }}
         >
           {config.icon}
         </Box>
 
-        {onClick && (
+        {onClick && !isMobile && (
           <IconButton
             size="small"
             sx={{

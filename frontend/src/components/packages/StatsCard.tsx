@@ -1,43 +1,52 @@
-import { Box, Typography } from '@mui/material';
-import RouteRoundedIcon from '@mui/icons-material/RouteRounded';
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 import LocalShippingRoundedIcon from '@mui/icons-material/LocalShippingRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
+
+export type FilterType = 'all' | 'in_transit' | 'delivered';
 
 interface StatItemProps {
   icon: React.ReactNode;
   value: number;
   label: string;
   color: string;
+  isMobile?: boolean;
+  isActive?: boolean;
+  onClick?: () => void;
 }
 
-const StatItem = ({ icon, value, label, color }: StatItemProps) => (
+const StatItem = ({ icon, value, label, color, isMobile, isActive, onClick }: StatItemProps) => (
   <Box
+    onClick={onClick}
     sx={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       gap: 0.5,
       flex: 1,
-      position: 'relative',
-      '&:not(:last-child)::after': {
-        content: '""',
-        position: 'absolute',
-        right: 0,
-        top: '50%',
-        transform: 'translateY(-50%)',
-        height: '60%',
-        width: '1px',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      py: isMobile ? 1.5 : 1,
+      px: 1,
+      borderRadius: 2,
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+      backgroundColor: isActive ? `${color}15` : 'transparent',
+      border: '2px solid',
+      borderColor: isActive ? color : 'transparent',
+      '&:hover': {
+        backgroundColor: `${color}10`,
+        transform: 'scale(1.02)',
+      },
+      '&:active': {
+        transform: 'scale(0.98)',
       },
     }}
   >
-    <Box sx={{ color, fontSize: 28 }}>{icon}</Box>
+    <Box sx={{ color, fontSize: isMobile ? 24 : 28 }}>{icon}</Box>
     <Typography
-      variant="h4"
+      variant={isMobile ? 'h5' : 'h4'}
       sx={{
         fontWeight: 700,
-        color: 'text.primary',
+        color: isActive ? color : 'text.primary',
         lineHeight: 1,
       }}
     >
@@ -46,9 +55,10 @@ const StatItem = ({ icon, value, label, color }: StatItemProps) => (
     <Typography
       variant="caption"
       sx={{
-        color: 'text.secondary',
-        fontSize: '0.75rem',
+        color: isActive ? color : 'text.secondary',
+        fontSize: isMobile ? '0.7rem' : '0.75rem',
         textAlign: 'center',
+        fontWeight: isActive ? 600 : 400,
       }}
     >
       {label}
@@ -57,49 +67,68 @@ const StatItem = ({ icon, value, label, color }: StatItemProps) => (
 );
 
 interface StatsCardProps {
-  onRoute: number;
   inTransit: number;
   delivered: number;
   total: number;
+  activeFilter?: FilterType;
+  onFilterChange?: (filter: FilterType) => void;
 }
 
-export const StatsCard = ({ onRoute, inTransit, delivered, total }: StatsCardProps) => {
+export const StatsCard = ({ 
+  inTransit, 
+  delivered, 
+  total,
+  activeFilter = 'in_transit',
+  onFilterChange,
+}: StatsCardProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const handleFilterClick = (filter: FilterType) => {
+    if (onFilterChange) {
+      onFilterChange(filter);
+    }
+  };
+
   return (
     <Box
       sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: isMobile ? 1 : 0.5,
         backgroundColor: 'background.paper',
         borderRadius: 4,
-        py: 3,
-        px: 2,
+        py: isMobile ? 2 : 2,
+        px: 1.5,
         border: '1px solid rgba(255, 255, 255, 0.06)',
       }}
     >
-      <StatItem
-        icon={<RouteRoundedIcon fontSize="inherit" />}
-        value={onRoute}
-        label="Em rota"
-        color="#F59E0B"
-      />
       <StatItem
         icon={<LocalShippingRoundedIcon fontSize="inherit" />}
         value={inTransit}
         label="Em Trânsito"
         color="#3B82F6"
+        isMobile={isMobile}
+        isActive={activeFilter === 'in_transit'}
+        onClick={() => handleFilterClick('in_transit')}
       />
       <StatItem
         icon={<CheckCircleRoundedIcon fontSize="inherit" />}
         value={delivered}
         label="Entregues"
         color="#10B981"
+        isMobile={isMobile}
+        isActive={activeFilter === 'delivered'}
+        onClick={() => handleFilterClick('delivered')}
       />
       <StatItem
         icon={<Inventory2RoundedIcon fontSize="inherit" />}
         value={total}
         label="Total"
-        color="#3B82F6"
+        color="#8B5CF6"
+        isMobile={isMobile}
+        isActive={activeFilter === 'all'}
+        onClick={() => handleFilterClick('all')}
       />
     </Box>
   );
