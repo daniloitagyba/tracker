@@ -7,7 +7,7 @@
 #
 
 app = 'tracker-api-yhorca'
-primary_region = 'gru'
+primary_region = 'iad'
 
 [build]
   dockerfile = 'Dockerfile'
