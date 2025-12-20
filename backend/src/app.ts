@@ -16,7 +16,23 @@ export const buildApp = async () => {
 
   // Register plugins
   await fastify.register(cors, {
-    origin: [env.FRONTEND_URL, 'https://tracker-frontend.fly.dev'],
+    origin: (origin, cb) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return cb(null, true);
+      
+      // Allow configured frontend URL and any fly.dev subdomains
+      const allowed = [
+        env.FRONTEND_URL,
+        /\.fly\.dev$/,
+        /localhost/,
+      ];
+      
+      const isAllowed = allowed.some((pattern) =>
+        pattern instanceof RegExp ? pattern.test(origin) : pattern === origin
+      );
+      
+      cb(null, isAllowed);
+    },
     credentials: true,
   });
 

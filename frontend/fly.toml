@@ -1,29 +1,28 @@
 # Fly.io configuration for Tracker Frontend
-# Deploy with: fly deploy --config frontend/fly.toml
 
-app = "tracker-frontend"
-primary_region = "gru"  # São Paulo, Brazil
+app = 'tracker-frontend-icy-glitter'
+primary_region = 'gru'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
+  [build.args]
+    VITE_API_URL = 'https://tracker-backend-icy-glitter-4734.fly.dev'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
-[[http_service.checks]]
-  grace_period = "5s"
-  interval = "30s"
-  method = "GET"
-  path = "/health"
-  timeout = "5s"
+  [[http_service.checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '5s'
+    method = 'GET'
+    path = '/health'
 
 [[vm]]
-  cpu_kind = "shared"
+  memory = '256mb'
   cpus = 1
-  memory_mb = 256
-

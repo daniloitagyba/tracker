@@ -1,0 +1,11 @@
+node_modules
+dist
+*.db
+*.db-journal
+.env
+.env.*
+*.log
+.git
+.gitignore
+README.md
+

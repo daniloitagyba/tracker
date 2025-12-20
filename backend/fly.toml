@@ -34,6 +34,5 @@ primary_region = 'gru'
     path = '/health'
 
 [[vm]]
-  memory = '256mb'
+  memory = '512mb'
   cpus = 1
-  memory_mb = 256

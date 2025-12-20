@@ -49,6 +49,6 @@ USER fastify
 ENV PORT=8080
 EXPOSE 8080
 
-# Run migrations and start server
-CMD ["dumb-init", "sh", "-c", "npx prisma migrate deploy && npm start"]
+# Push schema to database and start server
+CMD ["dumb-init", "sh", "-c", "npx prisma db push --skip-generate && npm start"]
 
