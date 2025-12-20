@@ -6,7 +6,7 @@ primary_region = 'gru'
 [build]
   dockerfile = 'Dockerfile'
   [build.args]
-    VITE_API_URL = 'https://tracker-backend-icy-glitter-4734.fly.dev'
+    VITE_API_URL = 'https://tracker-api-yhorca.fly.dev'
 
 [http_service]
   internal_port = 8080
