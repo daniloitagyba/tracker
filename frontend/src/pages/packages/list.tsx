@@ -1,6 +1,6 @@
 import { useState, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useList, useDelete, useCustom } from '@refinedev/core';
+import { useList, useCustom } from '@refinedev/core';
 import {
   Box,
   Typography,
@@ -40,8 +40,6 @@ export const PackageListPage = () => {
   const { data, isLoading, refetch } = useList<Package>({
     resource: 'packages',
   });
-
-  const { mutate: deletePackage } = useDelete<Package>();
 
   const { data: trackingData, isLoading: isTrackingLoading } = useCustom<PackageWithTracking>({
     url: `/packages/${selectedPackageId}/track`,

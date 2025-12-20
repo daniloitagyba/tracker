@@ -11,7 +11,7 @@ const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 const getGoogleAuthUrl = (): string => {
   const params = new URLSearchParams({
     client_id: env.GOOGLE_CLIENT_ID,
-    redirect_uri: `http://localhost:${env.PORT}/auth/google/callback`,
+    redirect_uri: `${env.BACKEND_URL}/auth/google/callback`,
     response_type: 'code',
     scope: 'openid email profile',
     access_type: 'offline',
@@ -36,7 +36,7 @@ const getGoogleTokens = async (code: string): Promise<GoogleTokenResponse> => {
       code,
       client_id: env.GOOGLE_CLIENT_ID,
       client_secret: env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: `http://localhost:${env.PORT}/auth/google/callback`,
+      redirect_uri: `${env.BACKEND_URL}/auth/google/callback`,
       grant_type: 'authorization_code',
     }),
   });

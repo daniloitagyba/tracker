@@ -10,6 +10,7 @@ const envSchema = z.object({
   RAPIDAPI_KEY: z.string(),
   PORT: z.coerce.number().default(3001),
   FRONTEND_URL: z.string().default('http://localhost:3000'),
+  BACKEND_URL: z.string().default('http://localhost:3001'),
 });
 
 const parsed = envSchema.safeParse(process.env);

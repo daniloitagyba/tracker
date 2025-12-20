@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreate } from '@refinedev/core';
 import {
@@ -37,7 +37,6 @@ const carriers: CarrierOption[] = [
   },
 ];
 
-const TRACKING_CODE_REGEX = /^[A-Z]{2}\d{9}[A-Z]{2}$/;
 const TRACKING_CODE_MAX_LENGTH = 13;
 
 export const AddPackagePage = () => {

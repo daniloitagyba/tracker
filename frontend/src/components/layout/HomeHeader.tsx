@@ -15,8 +15,6 @@ export const HomeHeader = () => {
   const { data: identity } = useGetIdentity<Identity>();
   const { mode, toggleTheme } = useThemeMode();
 
-  const firstName = identity?.name?.split(' ')[0] || 'Usuário';
-
   return (
     <Box
       sx={{
