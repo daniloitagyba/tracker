@@ -1,4 +1,4 @@
-import { Box, Typography, IconButton, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography, IconButton, useMediaQuery, useTheme, CircularProgress } from '@mui/material';
 import LocalShippingRoundedIcon from '@mui/icons-material/LocalShippingRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
@@ -6,11 +6,14 @@ import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded';
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import type { Package, PackageStatus } from '../../types';
 
 interface PackageCardProps {
   pkg: Package;
   onClick?: (pkg: Package) => void;
+  onUpdate?: (pkg: Package) => void;
+  isUpdating?: boolean;
 }
 
 const statusConfig: Record<PackageStatus, { icon: React.ReactNode; color: string; bgColor: string }> = {
@@ -51,7 +54,7 @@ const formatTimeAgo = (dateString?: string | null): string | null => {
   return `há ${diffInDays} dias`;
 };
 
-export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
+export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: PackageCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
@@ -60,6 +63,11 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
   const config = statusConfig[status] || statusConfig.in_transit;
   
   const timeAgo = formatTimeAgo(pkg.lastUpdate);
+
+  const handleUpdateClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onUpdate?.(pkg);
+  };
 
   return (
     <Box
@@ -199,7 +207,7 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
                 fontSize: { xs: '0.65rem', sm: '0.75rem' },
               }}
             >
-              Clique para rastrear
+              Encomenda não localizada
             </Typography>
           )}
         </Box>
@@ -229,6 +237,31 @@ export const PackageCard = ({ pkg, onClick }: PackageCardProps) => {
         >
           {config.icon}
         </Box>
+
+        {onUpdate && (
+          <IconButton
+            size="small"
+            onClick={handleUpdateClick}
+            disabled={isUpdating}
+            sx={{
+              color: 'primary.main',
+              '&:hover': {
+                backgroundColor: 'primary.dark',
+                color: 'primary.contrastText',
+              },
+              '&:disabled': {
+                color: 'text.disabled',
+              },
+            }}
+            aria-label="Atualizar pacote"
+          >
+            {isUpdating ? (
+              <CircularProgress size={16} sx={{ color: 'inherit' }} />
+            ) : (
+              <RefreshRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+            )}
+          </IconButton>
+        )}
 
         {onClick && !isMobile && (
           <IconButton

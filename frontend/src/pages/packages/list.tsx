@@ -1,6 +1,6 @@
 import { useState, Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useList, useCustom } from '@refinedev/core';
+import { useList, useCustom, useDelete } from '@refinedev/core';
 import {
   Box,
   Typography,
@@ -8,6 +8,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   IconButton,
   Alert,
   Snackbar,
@@ -22,6 +23,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CloseIcon from '@mui/icons-material/Close';
 import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import { apiRequest } from '../../services/api';
 import type { Package, PackageWithTracking, PackageStats } from '../../types';
 import { PackageCard } from '../../components/packages/PackageCard';
@@ -43,11 +45,17 @@ export const PackageListPage = () => {
   });
   const [isUpdatingAll, setIsUpdatingAll] = useState(false);
   const [updatingPackageId, setUpdatingPackageId] = useState<string | null>(null);
+  const [updatingSinglePackageId, setUpdatingSinglePackageId] = useState<string | null>(null);
   const [updateProgress, setUpdateProgress] = useState({ current: 0, total: 0 });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [packageToDelete, setPackageToDelete] = useState<Package | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { data, isLoading, refetch } = useList<Package>({
     resource: 'packages',
   });
+
+  const { mutate: deletePackage } = useDelete();
 
   const { data: trackingData, isLoading: isTrackingLoading } = useCustom<PackageWithTracking>({
     url: `/packages/${selectedPackageId}/track`,
@@ -161,6 +169,9 @@ export const PackageListPage = () => {
     setTrackingOpen(true);
   };
 
+  // Get the selected package for deletion
+  const selectedPackage = packages.find((pkg) => pkg.id === selectedPackageId);
+
   const handleCloseTracking = () => {
     setTrackingOpen(false);
     setSelectedPackageId(null);
@@ -170,6 +181,94 @@ export const PackageListPage = () => {
 
   const handleAddPackage = () => {
     navigate('/packages/add');
+  };
+
+  const handleDeleteClick = (pkg: Package) => {
+    setPackageToDelete(pkg);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!packageToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await new Promise<void>((resolve, reject) => {
+        deletePackage(
+          {
+            resource: 'packages',
+            id: packageToDelete.id,
+          },
+          {
+            onSuccess: async () => {
+              // Close dialogs first
+              setDeleteDialogOpen(false);
+              setPackageToDelete(null);
+              setTrackingOpen(false);
+              setSelectedPackageId(null);
+              
+              // Show success message
+              setSnackbar({
+                open: true,
+                message: 'Pacote removido com sucesso!',
+                severity: 'success',
+              });
+              
+              // Force refetch to ensure list is updated
+              await refetch();
+              
+              resolve();
+            },
+            onError: (error) => {
+              console.error('Error deleting package:', error);
+              setSnackbar({
+                open: true,
+                message: 'Erro ao remover pacote. Tente novamente.',
+                severity: 'error',
+              });
+              reject(error);
+            },
+          }
+        );
+      });
+    } catch (error) {
+      // Error already handled in onError callback
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setPackageToDelete(null);
+  };
+
+  const handleUpdatePackage = async (pkg: Package) => {
+    setUpdatingSinglePackageId(pkg.id);
+    
+    try {
+      await apiRequest<PackageWithTracking>(`/packages/${pkg.id}/track`, {
+        method: 'GET',
+      });
+      
+      setSnackbar({
+        open: true,
+        message: 'Pacote atualizado com sucesso!',
+        severity: 'success',
+      });
+      
+      // Refresh the list
+      await refetch();
+    } catch (error) {
+      console.error(`Error updating package ${pkg.trackingCode}:`, error);
+      setSnackbar({
+        open: true,
+        message: 'Erro ao atualizar pacote. Tente novamente.',
+        severity: 'error',
+      });
+    } finally {
+      setUpdatingSinglePackageId(null);
+    }
   };
 
   return (
@@ -449,6 +548,8 @@ export const PackageListPage = () => {
                 <PackageCard
                   pkg={pkg}
                   onClick={handlePackageClick}
+                  onUpdate={handleUpdatePackage}
+                  isUpdating={updatingSinglePackageId === pkg.id}
                 />
               </Box>
             ))}
@@ -528,17 +629,38 @@ export const PackageListPage = () => {
           >
             Rastreamento
           </Typography>
-          <IconButton 
-            onClick={handleCloseTracking} 
-            size={isMobile ? 'medium' : 'large'}
-            sx={{
-              '&:active': {
-                transform: 'scale(0.9)',
-              },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {selectedPackage && (
+              <IconButton 
+                onClick={() => handleDeleteClick(selectedPackage)} 
+                size={isMobile ? 'medium' : 'large'}
+                sx={{
+                  color: 'error.main',
+                  '&:hover': {
+                    backgroundColor: 'error.dark',
+                    color: 'error.contrastText',
+                  },
+                  '&:active': {
+                    transform: 'scale(0.9)',
+                  },
+                }}
+                aria-label="Remover pacote"
+              >
+                <DeleteRoundedIcon />
+              </IconButton>
+            )}
+            <IconButton 
+              onClick={handleCloseTracking} 
+              size={isMobile ? 'medium' : 'large'}
+              sx={{
+                '&:active': {
+                  transform: 'scale(0.9)',
+                },
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </DialogTitle>
         <DialogContent 
           sx={{ 
@@ -588,6 +710,113 @@ export const PackageListPage = () => {
             </Alert>
           )}
         </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            backgroundColor: 'background.paper',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            py: { xs: 2, sm: 2.5 },
+            px: { xs: 2, sm: 3 },
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 600,
+              fontSize: { xs: '1.125rem', sm: '1.25rem' },
+            }}
+          >
+            Remover Pacote
+          </Typography>
+          <IconButton
+            onClick={handleDeleteCancel}
+            size="small"
+            disabled={isDeleting}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            px: { xs: 2, sm: 3 },
+            py: { xs: 2.5, sm: 3 },
+          }}
+        >
+          <Typography
+            variant="body1"
+            sx={{
+              mb: 1,
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+            }}
+          >
+            Tem certeza que deseja remover o pacote{' '}
+            <strong>{packageToDelete?.description || packageToDelete?.trackingCode}</strong>?
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            }}
+          >
+            Esta ação não pode ser desfeita.
+          </Typography>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            px: { xs: 2, sm: 3 },
+            py: { xs: 2, sm: 2.5 },
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            gap: 1,
+          }}
+        >
+          <Button
+            onClick={handleDeleteCancel}
+            disabled={isDeleting}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 500,
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            disabled={isDeleting}
+            variant="contained"
+            color="error"
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              minWidth: 100,
+            }}
+            startIcon={
+              isDeleting ? (
+                <CircularProgress size={16} sx={{ color: 'inherit' }} />
+              ) : null
+            }
+          >
+            {isDeleting ? 'Removendo...' : 'Remover'}
+          </Button>
+        </DialogActions>
       </Dialog>
 
       <Snackbar
