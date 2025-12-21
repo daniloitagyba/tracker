@@ -7,7 +7,7 @@
 #
 
 app = 'tracker-api-yhorca'
-primary_region = 'iad'
+primary_region = 'gru'
 
 [build]
   dockerfile = 'Dockerfile'
@@ -17,7 +17,7 @@ primary_region = 'iad'
   NODE_ENV = 'production'
   PORT = '8080'
   DATABASE_URL = 'file:/data/tracker.db'
-  FRONTEND_URL = 'https://tracker-frontend.fly.dev'
+  FRONTEND_URL = 'https://tracker-app.fly.dev/'
 
 # Volume para persistir SQLite
 [[mounts]]
