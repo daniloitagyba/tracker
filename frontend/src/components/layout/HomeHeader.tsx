@@ -39,7 +39,7 @@ export const HomeHeader = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        px: { xs: 2, md: 3 },
+        px: { xs: 1, sm: 2, md: 3 },
         py: 2,
         maxWidth: 'md',
         mx: 'auto',

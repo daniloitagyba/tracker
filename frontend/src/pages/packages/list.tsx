@@ -14,6 +14,7 @@ import {
   Fab,
   useMediaQuery,
   useTheme,
+  CircularProgress,
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CloseIcon from '@mui/icons-material/Close';
@@ -22,12 +23,7 @@ import type { Package, PackageWithTracking, PackageStats } from '../../types';
 import { PackageCard } from '../../components/packages/PackageCard';
 import { StatsCard, FilterType } from '../../components/packages/StatsCard';
 import { Layout } from '../../components/layout/Layout';
-
-const TrackingTimeline = lazy(() =>
-  import('../../components/packages/TrackingTimeline').then((module) => ({
-    default: module.TrackingTimeline,
-  }))
-);
+import { TrackingTimeline } from '../../components/packages/TrackingTimeline';
 
 export const PackageListPage = () => {
   const navigate = useNavigate();
@@ -113,61 +109,164 @@ export const PackageListPage = () => {
 
   return (
     <Layout>
-      <Box sx={{ pb: 10 }}>
-        {/* Stats Card */}
-        <Box sx={{ mb: 3 }}>
-          {isLoading ? (
-            <Skeleton variant="rounded" height={120} sx={{ borderRadius: 4 }} />
-          ) : (
-            <StatsCard
-              inTransit={stats.inTransit}
-              delivered={stats.delivered}
-              total={stats.total}
-              activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
-            />
-          )}
-        </Box>
-
-        {/* Package List */}
-        {isLoading ? (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} variant="rounded" height={120} sx={{ borderRadius: 3 }} />
-            ))}
-          </Box>
-        ) : packages.length === 0 ? (
+      <Box 
+        sx={{ 
+          pb: { xs: 12, sm: 10 },
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: { xs: 'center', sm: 'stretch' },
+        }}
+      >
+        {/* Loading Spinner - Initial Load */}
+        {isLoading && packages.length === 0 ? (
           <Box
             sx={{
-              py: 8,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: { xs: '50vh', sm: '60vh' },
+              gap: 3,
+            }}
+          >
+            <CircularProgress 
+              size={isMobile ? 48 : 56} 
+              thickness={4}
+              sx={{
+                color: 'primary.main',
+              }}
+            />
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                fontWeight: 500,
+              }}
+            >
+              Carregando encomendas...
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            {/* Stats Card */}
+            <Box 
+              sx={{ 
+                mb: { xs: 2.5, sm: 3 }, 
+                width: '100%',
+                px: { xs: 0.5, sm: 0 },
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <Box sx={{ width: '100%', maxWidth: '100%' }}>
+                {isLoading ? (
+                  <Skeleton 
+                    variant="rounded" 
+                    height={isMobile ? 100 : 120} 
+                    sx={{ borderRadius: 4 }} 
+                  />
+                ) : (
+                  <StatsCard
+                    inTransit={stats.inTransit}
+                    delivered={stats.delivered}
+                    total={stats.total}
+                    activeFilter={activeFilter}
+                    onFilterChange={setActiveFilter}
+                  />
+                )}
+              </Box>
+            </Box>
+
+            {/* Package List */}
+            {isLoading && packages.length > 0 ? (
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: { xs: 1.5, sm: 2 },
+                  px: { xs: 0.5, sm: 0 },
+                  width: '100%',
+                  alignItems: { xs: 'center', sm: 'stretch' },
+                }}
+              >
+                {[1, 2, 3].map((i) => (
+                  <Box key={i} sx={{ width: '100%', maxWidth: '100%' }}>
+                    <Skeleton 
+                      variant="rounded" 
+                      height={isMobile ? 100 : 120} 
+                      sx={{ borderRadius: 3 }} 
+                    />
+                  </Box>
+                ))}
+              </Box>
+            ) : packages.length === 0 ? (
+          <Box
+            sx={{
+              py: { xs: 6, sm: 8 },
+              px: { xs: 1.5, sm: 3 },
               textAlign: 'center',
               backgroundColor: 'background.paper',
               borderRadius: 4,
               border: '1px solid',
               borderColor: 'divider',
+              mx: { xs: 0.5, sm: 0 },
+              width: { xs: 'calc(100% - 4px)', sm: '100%' },
             }}
           >
-            <Inventory2RoundedIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
-            <Typography variant="h6" color="text.secondary" gutterBottom>
+            <Inventory2RoundedIcon 
+              sx={{ 
+                fontSize: { xs: 48, sm: 64 }, 
+                color: 'text.secondary', 
+                mb: 2, 
+                opacity: 0.5 
+              }} 
+            />
+            <Typography 
+              variant={isMobile ? 'subtitle1' : 'h6'} 
+              color="text.secondary" 
+              gutterBottom
+              sx={{ fontWeight: 600 }}
+            >
               Nenhuma encomenda cadastrada
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+            >
               Adicione sua primeira encomenda para começar a rastrear
             </Typography>
           </Box>
         ) : filteredPackages.length === 0 ? (
           <Box
             sx={{
-              py: 6,
+              py: { xs: 5, sm: 6 },
+              px: { xs: 1.5, sm: 3 },
               textAlign: 'center',
               backgroundColor: 'background.paper',
               borderRadius: 4,
               border: '1px solid',
               borderColor: 'divider',
+              mx: { xs: 0.5, sm: 0 },
+              width: { xs: 'calc(100% - 4px)', sm: '100%' },
             }}
           >
-            <Inventory2RoundedIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
-            <Typography variant="body1" color="text.secondary" gutterBottom>
+            <Inventory2RoundedIcon 
+              sx={{ 
+                fontSize: { xs: 40, sm: 48 }, 
+                color: 'text.secondary', 
+                mb: 2, 
+                opacity: 0.5 
+              }} 
+            />
+            <Typography 
+              variant={isMobile ? 'body2' : 'body1'} 
+              color="text.secondary" 
+              gutterBottom
+              sx={{ fontWeight: 500 }}
+            >
               Nenhuma encomenda {getFilterLabel(activeFilter)}
             </Typography>
             <Typography 
@@ -175,6 +274,8 @@ export const PackageListPage = () => {
               color="primary" 
               sx={{ 
                 cursor: 'pointer',
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                fontWeight: 500,
                 '&:hover': { textDecoration: 'underline' },
               }}
               onClick={() => setActiveFilter('all')}
@@ -183,15 +284,33 @@ export const PackageListPage = () => {
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: { xs: 1.5, sm: 2 },
+              width: '100%',
+              alignItems: { xs: 'center', sm: 'stretch' },
+              px: { xs: 0.5, sm: 0 },
+            }}
+          >
             {filteredPackages.map((pkg) => (
-              <PackageCard
+              <Box
                 key={pkg.id}
-                pkg={pkg}
-                onClick={handlePackageClick}
-              />
+                sx={{
+                  width: '100%',
+                  maxWidth: '100%',
+                }}
+              >
+                <PackageCard
+                  pkg={pkg}
+                  onClick={handlePackageClick}
+                />
+              </Box>
             ))}
           </Box>
+        )}
+          </>
         )}
       </Box>
 
@@ -201,18 +320,26 @@ export const PackageListPage = () => {
         onClick={handleAddPackage}
         sx={{
           position: 'fixed',
-          bottom: { xs: 16, sm: 24 },
-          right: { xs: 16, sm: 24 },
+          bottom: { xs: 20, sm: 24 },
+          right: { xs: 20, sm: 24 },
           width: { xs: 56, sm: 64 },
           height: { xs: 56, sm: 64 },
           background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
-          boxShadow: '0 8px 32px rgba(59, 130, 246, 0.4)',
+          boxShadow: isMobile 
+            ? '0 4px 16px rgba(59, 130, 246, 0.5)' 
+            : '0 8px 32px rgba(59, 130, 246, 0.4)',
+          zIndex: 1000,
           '&:hover': {
             background: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)',
+            transform: 'scale(1.05)',
+          },
+          '&:active': {
+            transform: 'scale(0.95)',
           },
         }}
+        aria-label="Adicionar encomenda"
       >
-        <AddRoundedIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
+        <AddRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 } }} />
       </Fab>
 
       {/* Tracking Dialog */}
@@ -238,32 +365,81 @@ export const PackageListPage = () => {
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center',
-            py: isMobile ? 2 : 2,
-            px: isMobile ? 2 : 3,
+            py: { xs: 2, sm: 2.5 },
+            px: { xs: 2, sm: 3 },
             borderBottom: isMobile ? '1px solid' : 'none',
             borderColor: 'divider',
+            position: 'sticky',
+            top: 0,
+            backgroundColor: 'background.paper',
+            zIndex: 1,
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 600, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontWeight: 600, 
+              fontSize: { xs: '1.125rem', sm: '1.25rem' } 
+            }}
+          >
             Rastreamento
           </Typography>
-          <IconButton onClick={handleCloseTracking} size={isMobile ? 'medium' : 'large'}>
+          <IconButton 
+            onClick={handleCloseTracking} 
+            size={isMobile ? 'medium' : 'large'}
+            sx={{
+              '&:active': {
+                transform: 'scale(0.9)',
+              },
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 } }}>
+        <DialogContent 
+          sx={{ 
+            px: { xs: 2, sm: 3 }, 
+            py: { xs: 2.5, sm: 3 },
+            '&.MuiDialogContent-root': {
+              paddingTop: { xs: 2.5, sm: 3 },
+            },
+          }}
+        >
           {isTrackingLoading ? (
-            <Box sx={{ py: 4 }}>
-              <Skeleton variant="text" width="60%" height={40} />
-              <Skeleton variant="rounded" height={100} sx={{ mt: 2 }} />
-              <Skeleton variant="rounded" height={100} sx={{ mt: 2 }} />
+            <Box 
+              sx={{ 
+                py: { xs: 6, sm: 8 },
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              <CircularProgress 
+                size={isMobile ? 40 : 48} 
+                thickness={4}
+                sx={{ color: 'primary.main' }}
+              />
+              <Typography 
+                variant="body2" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+              >
+                Carregando rastreamento...
+              </Typography>
             </Box>
           ) : trackingData?.data?.tracking ? (
-            <Suspense fallback={<Skeleton variant="rounded" height={300} />}>
-              <TrackingTimeline tracking={trackingData.data.tracking} />
-            </Suspense>
+            <TrackingTimeline tracking={trackingData.data.tracking} />
           ) : (
-            <Alert severity="info">
+            <Alert 
+              severity="info"
+              sx={{
+                mt: { xs: 1, sm: 2 },
+                '& .MuiAlert-message': {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                },
+              }}
+            >
               Não foi possível obter informações de rastreamento.
             </Alert>
           )}

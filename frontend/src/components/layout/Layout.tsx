@@ -17,9 +17,10 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
       {showHeader && <HomeHeader />}
       <Container 
         maxWidth="md" 
+        disableGutters
         sx={{ 
-          py: { xs: 2, md: 3 },
-          px: { xs: 2, md: 3 },
+          py: { xs: 1.5, sm: 2, md: 3 },
+          px: { xs: 0.5, sm: 2, md: 3 },
         }}
       >
         {children}

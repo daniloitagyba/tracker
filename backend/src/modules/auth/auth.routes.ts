@@ -42,7 +42,21 @@ const getGoogleTokens = async (code: string): Promise<GoogleTokenResponse> => {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to get Google tokens');
+    const errorData = await response.json().catch(() => ({}));
+    const errorMessage = errorData.error_description || errorData.error || 'Failed to get Google tokens';
+    
+    // Provide specific error messages for common issues
+    if (errorData.error === 'deleted_client') {
+      throw new Error('OAuth client was deleted. Please create a new OAuth client in Google Cloud Console and update your .env file.');
+    }
+    if (errorData.error === 'invalid_client') {
+      throw new Error('Invalid OAuth client credentials. Please check your GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env file.');
+    }
+    if (errorData.error === 'redirect_uri_mismatch') {
+      throw new Error(`Redirect URI mismatch. Make sure '${env.BACKEND_URL}/auth/google/callback' is added to authorized redirect URIs in Google Cloud Console.`);
+    }
+    
+    throw new Error(`Google OAuth error: ${errorMessage}`);
   }
 
   return response.json() as Promise<GoogleTokenResponse>;
@@ -122,7 +136,10 @@ export const authRoutes = async (fastify: FastifyInstance) => {
         return reply.redirect(`${env.FRONTEND_URL}/auth/callback?${params.toString()}`);
       } catch (err) {
         console.error('Auth error:', err);
-        return reply.redirect(`${env.FRONTEND_URL}/login?error=auth_failed`);
+        const errorMessage = err instanceof Error ? err.message : 'auth_failed';
+        // URL encode the error message to pass it safely
+        const encodedError = encodeURIComponent(errorMessage);
+        return reply.redirect(`${env.FRONTEND_URL}/login?error=${encodedError}`);
       }
     }
   );

@@ -84,7 +84,31 @@ export const LoginPage = () => {
 
           {error && (
             <Alert severity="error" sx={{ mb: 3, textAlign: 'left' }}>
-              Falha na autenticação. Por favor, tente novamente.
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                Erro na autenticação
+              </Typography>
+              <Typography variant="body2" component="div">
+                {decodeURIComponent(error).includes('OAuth client was deleted') ? (
+                  <>
+                    O cliente OAuth foi deletado. Por favor:
+                    <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
+                      <li>Crie um novo cliente OAuth no Google Cloud Console</li>
+                      <li>Adicione a URI de redirecionamento: <code style={{ fontSize: '0.85em' }}>http://localhost:3001/auth/google/callback</code></li>
+                      <li>Atualize o arquivo <code style={{ fontSize: '0.85em' }}>backend/.env</code> com as novas credenciais</li>
+                    </ul>
+                  </>
+                ) : decodeURIComponent(error).includes('Invalid OAuth client credentials') ? (
+                  <>
+                    Credenciais OAuth inválidas. Verifique se <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_ID</code> e <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_SECRET</code> estão corretos no arquivo <code style={{ fontSize: '0.85em' }}>backend/.env</code>.
+                  </>
+                ) : decodeURIComponent(error).includes('Redirect URI mismatch') ? (
+                  <>
+                    URI de redirecionamento não corresponde. Adicione <code style={{ fontSize: '0.85em' }}>http://localhost:3001/auth/google/callback</code> às URIs autorizadas no Google Cloud Console.
+                  </>
+                ) : (
+                  decodeURIComponent(error)
+                )}
+              </Typography>
             </Alert>
           )}
 

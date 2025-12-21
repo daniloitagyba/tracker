@@ -34,6 +34,8 @@ Aplicação fullstack para rastreamento de encomendas postais com autenticação
 
 ## Configuração do Google OAuth
 
+⚠️ **IMPORTANTE**: Para desenvolvimento local, você precisa criar um cliente OAuth no Google Cloud Console.
+
 ### 1. Criar projeto no Google Cloud Console
 
 1. Acesse [Google Cloud Console](https://console.cloud.google.com/)
@@ -44,17 +46,28 @@ Aplicação fullstack para rastreamento de encomendas postais com autenticação
    - Nome do app: `Tracker`
    - Email de suporte: seu email
    - Adicione os escopos: `email`, `profile`, `openid`
+   - Salve e continue
 
 ### 2. Criar credenciais OAuth 2.0
 
 1. Vá em **APIs e Serviços** > **Credenciais**
 2. Clique em **Criar credenciais** > **ID do cliente OAuth**
 3. Tipo de aplicativo: **Aplicativo da Web**
-4. Nome: `Tracker Web Client`
-5. URIs de redirecionamento autorizados:
-   - `http://localhost:3001/auth/google/callback` (desenvolvimento)
+4. Nome: `Tracker Web Client` (ou qualquer nome)
+5. **URIs de redirecionamento autorizados** (CRÍTICO - deve ser exatamente assim):
+   - `http://localhost:3001/auth/google/callback`
+   - ⚠️ **Não use** `https://` ou porta diferente
+   - ⚠️ **Não adicione** barra no final
 6. Clique em **Criar**
 7. Copie o **Client ID** e **Client Secret**
+8. Cole-os no arquivo `backend/.env` (veja seção de instalação abaixo)
+
+### 3. Verificar configuração
+
+Se você receber o erro "deleted_client" ou "invalid_client":
+- Verifique se o Client ID e Secret estão corretos no arquivo `backend/.env`
+- Verifique se a URI de redirecionamento está **exatamente** como `http://localhost:3001/auth/google/callback` no Google Cloud Console
+- Certifique-se de que não há espaços extras ou caracteres especiais nas credenciais
 
 ---
 
@@ -77,35 +90,45 @@ npm install
 
 #### Backend
 
-Crie o arquivo `backend/.env`:
+1. Copie o arquivo de exemplo:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
 
-```env
-# Database
-DATABASE_URL="file:./dev.db"
+2. Edite o arquivo `backend/.env` e preencha com suas credenciais:
+   ```env
+   # Database
+   DATABASE_URL="file:./dev.db"
 
-# Google OAuth
-GOOGLE_CLIENT_ID="seu_client_id_aqui"
-GOOGLE_CLIENT_SECRET="seu_client_secret_aqui"
+   # Google OAuth (obrigatório - veja seção de configuração acima)
+   GOOGLE_CLIENT_ID="seu_client_id_aqui"
+   GOOGLE_CLIENT_SECRET="seu_client_secret_aqui"
 
-# JWT (gere strings aleatórias de pelo menos 32 caracteres)
-JWT_SECRET="sua_chave_secreta_jwt_min_32_chars"
-JWT_REFRESH_SECRET="sua_chave_refresh_jwt_min_32_chars"
+   # JWT (gere strings aleatórias de pelo menos 32 caracteres)
+   # Você pode gerar com: openssl rand -base64 32
+   JWT_SECRET="sua_chave_secreta_jwt_min_32_chars"
+   JWT_REFRESH_SECRET="sua_chave_refresh_jwt_min_32_chars"
 
-# RapidAPI (Correios Tracking)
-RAPIDAPI_KEY="sua_rapidapi_key_aqui"
+   # RapidAPI (Correios Tracking)
+   RAPIDAPI_KEY="sua_rapidapi_key_aqui"
 
-# App
-PORT=3001
-FRONTEND_URL="http://localhost:3000"
-```
+   # App
+   PORT=3001
+   FRONTEND_URL="http://localhost:3000"
+   BACKEND_URL="http://localhost:3001"
+   ```
 
 #### Frontend
 
-Crie o arquivo `frontend/.env`:
+1. Copie o arquivo de exemplo:
+   ```bash
+   cp frontend/.env.example frontend/.env
+   ```
 
-```env
-VITE_API_URL="http://localhost:3001"
-```
+2. O arquivo `frontend/.env` já está configurado corretamente para localhost:
+   ```env
+   VITE_API_URL="http://localhost:3001"
+   ```
 
 ### 4. Configurar banco de dados
 
