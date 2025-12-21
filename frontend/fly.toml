@@ -1,16 +1,12 @@
-# fly.toml app configuration file generated for tracker-front-k8nyza on 2025-12-20T21:46:02Z
+# fly.toml app configuration file generated for tracker-zenmya on 2025-12-21T01:03:07Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'tracker-front-k8nyza'
-primary_region = 'iad'
+app = 'tracker-zenmya'
+primary_region = 'gru'
 
 [build]
-
-[env]
-  # Variáveis não-sensíveis
-  VITE_API_URL = 'VITE_API_URL'
 
 [http_service]
   internal_port = 8080
