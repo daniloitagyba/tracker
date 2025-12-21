@@ -15,10 +15,14 @@ import {
   useMediaQuery,
   useTheme,
   CircularProgress,
+  Button,
+  LinearProgress,
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import CloseIcon from '@mui/icons-material/Close';
 import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
+import { apiRequest } from '../../services/api';
 import type { Package, PackageWithTracking, PackageStats } from '../../types';
 import { PackageCard } from '../../components/packages/PackageCard';
 import { StatsCard, FilterType } from '../../components/packages/StatsCard';
@@ -37,6 +41,9 @@ export const PackageListPage = () => {
     message: '',
     severity: 'success',
   });
+  const [isUpdatingAll, setIsUpdatingAll] = useState(false);
+  const [updatingPackageId, setUpdatingPackageId] = useState<string | null>(null);
+  const [updateProgress, setUpdateProgress] = useState({ current: 0, total: 0 });
 
   const { data, isLoading, refetch } = useList<Package>({
     resource: 'packages',
@@ -81,6 +88,64 @@ export const PackageListPage = () => {
     if (activeFilter === 'in_transit') return category === 'in_transit';
     return true;
   });
+
+  // Get packages in transit for bulk update
+  const inTransitPackages = packages.filter((pkg) => !pkg.isDelivered);
+
+  // Handle bulk update
+  const handleUpdateAll = async () => {
+    if (inTransitPackages.length === 0) return;
+
+    setIsUpdatingAll(true);
+    setUpdateProgress({ current: 0, total: inTransitPackages.length });
+    setUpdatingPackageId(null);
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (let i = 0; i < inTransitPackages.length; i++) {
+      const pkg = inTransitPackages[i];
+      setUpdatingPackageId(pkg.id);
+      setUpdateProgress({ current: i + 1, total: inTransitPackages.length });
+
+      try {
+        await apiRequest<PackageWithTracking>(`/packages/${pkg.id}/track`, {
+          method: 'GET',
+        });
+        successCount++;
+      } catch (error) {
+        console.error(`Error updating package ${pkg.trackingCode}:`, error);
+        errorCount++;
+      }
+
+      // Small delay to avoid overwhelming the API
+      if (i < inTransitPackages.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    }
+
+    setIsUpdatingAll(false);
+    setUpdatingPackageId(null);
+    setUpdateProgress({ current: 0, total: 0 });
+
+    // Refresh the list
+    await refetch();
+
+    // Show result message
+    if (errorCount === 0) {
+      setSnackbar({
+        open: true,
+        message: `Todas as ${successCount} encomendas foram atualizadas com sucesso!`,
+        severity: 'success',
+      });
+    } else {
+      setSnackbar({
+        open: true,
+        message: `${successCount} encomendas atualizadas. ${errorCount} falharam.`,
+        severity: 'error',
+      });
+    }
+  };
 
   // Get filter label for empty state
   const getFilterLabel = (filter: FilterType): string => {
@@ -178,6 +243,85 @@ export const PackageListPage = () => {
                 )}
               </Box>
             </Box>
+
+            {/* Update All Button - Only show when filter is in_transit */}
+            {activeFilter === 'in_transit' && inTransitPackages.length > 0 && (
+              <Box 
+                sx={{ 
+                  mb: { xs: 2, sm: 2.5 },
+                  width: '100%',
+                  px: { xs: 0.5, sm: 0 },
+                }}
+              >
+                <Button
+                  variant="contained"
+                  startIcon={
+                    isUpdatingAll ? (
+                      <CircularProgress size={16} sx={{ color: 'inherit' }} />
+                    ) : (
+                      <RefreshRoundedIcon />
+                    )
+                  }
+                  onClick={handleUpdateAll}
+                  disabled={isUpdatingAll}
+                  fullWidth
+                  sx={{
+                    py: 1.5,
+                    borderRadius: 2,
+                    background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+                    fontWeight: 600,
+                    textTransform: 'none',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)',
+                    },
+                    '&:disabled': {
+                      background: 'linear-gradient(135deg, #9CA3AF 0%, #6B7280 100%)',
+                    },
+                  }}
+                >
+                  {isUpdatingAll
+                    ? `Atualizando... (${updateProgress.current}/${updateProgress.total})`
+                    : `Atualizar Todas (${inTransitPackages.length})`}
+                </Button>
+                
+                {/* Progress indicator showing current package */}
+                {isUpdatingAll && updatingPackageId && (
+                  <Box sx={{ mt: 1.5 }}>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={(updateProgress.current / updateProgress.total) * 100}
+                      sx={{
+                        height: 6,
+                        borderRadius: 3,
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        '& .MuiLinearProgress-bar': {
+                          borderRadius: 3,
+                          background: 'linear-gradient(90deg, #3B82F6 0%, #60A5FA 100%)',
+                        },
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{
+                        mt: 1,
+                        display: 'block',
+                        textAlign: 'center',
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                      }}
+                    >
+                      {(() => {
+                        const currentPkg = inTransitPackages[updateProgress.current - 1];
+                        return currentPkg
+                          ? `Atualizando: ${currentPkg.description || currentPkg.trackingCode}`
+                          : 'Processando...';
+                      })()}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            )}
 
             {/* Package List */}
             {isLoading && packages.length > 0 ? (
