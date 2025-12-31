@@ -3,9 +3,6 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Build argument for API URL (will be replaced at build time)
-ARG VITE_API_URL=https://tracker-api-yhorca.fly.dev
-
 # Copy package files
 COPY package*.json ./
 
