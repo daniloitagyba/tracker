@@ -40,7 +40,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
-# Create data directory for SQLite (Fly.io volume mount)
+# Create data directory for SQLite
 RUN mkdir -p /data && chown -R fastify:nodejs /data
 
 # Change ownership
@@ -48,9 +48,9 @@ RUN chown -R fastify:nodejs /app
 
 USER fastify
 
-# Fly.io uses port 8080 by default
-ENV PORT=8080
-EXPOSE 8080
+# Port can be configured via environment variable
+ENV PORT=10000
+EXPOSE 10000
 
 # Push schema to database and start server
 CMD ["dumb-init", "sh", "-c", "npx prisma db push --skip-generate && npm start"]

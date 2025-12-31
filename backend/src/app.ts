@@ -20,9 +20,10 @@ export const buildApp = async () => {
       // Allow requests with no origin (mobile apps, curl, etc.)
       if (!origin) return cb(null, true);
       
-      // Allow configured frontend URL and any fly.dev subdomains
+      // Allow configured frontend URL and hosting platform domains
       const allowed = [
         env.FRONTEND_URL,
+        /\.onrender\.com$/,
         /\.fly\.dev$/,
         /localhost/,
       ];
