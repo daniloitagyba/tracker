@@ -28,6 +28,11 @@ interface GoogleTokenResponse {
   token_type: string;
 }
 
+interface GoogleErrorResponse {
+  error?: string;
+  error_description?: string;
+}
+
 const getGoogleTokens = async (code: string): Promise<GoogleTokenResponse> => {
   const response = await fetch(GOOGLE_TOKEN_URL, {
     method: 'POST',
@@ -42,9 +47,9 @@ const getGoogleTokens = async (code: string): Promise<GoogleTokenResponse> => {
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
+    const errorData = (await response.json().catch(() => ({}))) as GoogleErrorResponse;
     const errorMessage = errorData.error_description || errorData.error || 'Failed to get Google tokens';
-    
+
     // Provide specific error messages for common issues
     if (errorData.error === 'deleted_client') {
       throw new Error('OAuth client was deleted. Please create a new OAuth client in Google Cloud Console and update your .env file.');
@@ -55,7 +60,7 @@ const getGoogleTokens = async (code: string): Promise<GoogleTokenResponse> => {
     if (errorData.error === 'redirect_uri_mismatch') {
       throw new Error(`Redirect URI mismatch. Make sure '${env.BACKEND_URL}/auth/google/callback' is added to authorized redirect URIs in Google Cloud Console.`);
     }
-    
+
     throw new Error(`Google OAuth error: ${errorMessage}`);
   }
 
