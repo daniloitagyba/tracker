@@ -5,8 +5,23 @@ RUN corepack enable
 
 FROM base AS builder
 WORKDIR /app
-COPY . .
+
+# Copy workspace config files
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+
+# Copy package.json for workspaces
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
+
+# Install dependencies (frozen lockfile to ensure reproducibility)
 RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY backend ./backend
+COPY frontend ./frontend
+COPY tsconfig.json ./
+
+# Build backend
 RUN pnpm --filter tracker-backend build
 RUN pnpm --filter tracker-backend deploy --prod /app/deployed
 
@@ -34,5 +49,4 @@ ENV PORT=10000
 EXPOSE 10000
 
 # Push schema to database and start server
-# We use 'node dist/server.js' directly instead of npm start to avoid npm overhead
 CMD ["dumb-init", "sh", "-c", "npx prisma db push --skip-generate && node dist/server.js"]

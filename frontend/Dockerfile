@@ -5,15 +5,29 @@ RUN corepack enable
 
 FROM base AS builder
 WORKDIR /app
-COPY . .
+
+# Copy workspace config files
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+
+# Copy package.json for workspaces
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
+
+# Install dependencies
 RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY backend ./backend
+COPY frontend ./frontend
+COPY tsconfig.json ./
+
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 RUN pnpm --filter tracker-frontend build
 
 FROM nginx:alpine AS runner
 # Copy custom nginx config
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Configure permissions for non-root user
 RUN touch /var/run/nginx.pid && \
