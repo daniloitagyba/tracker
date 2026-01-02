@@ -9,16 +9,14 @@ WORKDIR /app
 # Copy workspace config files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 
-# Copy package.json for workspaces
+# Copy package.json for workspace
 COPY backend/package.json ./backend/
-COPY frontend/package.json ./frontend/
 
 # Install dependencies (frozen lockfile to ensure reproducibility)
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
+# Copy backend source code only
 COPY backend ./backend
-COPY frontend ./frontend
 
 # Build backend
 RUN pnpm --filter tracker-backend build

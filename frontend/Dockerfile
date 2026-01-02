@@ -9,15 +9,13 @@ WORKDIR /app
 # Copy workspace config files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 
-# Copy package.json for workspaces
-COPY backend/package.json ./backend/
+# Copy package.json for workspace
 COPY frontend/package.json ./frontend/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
-COPY backend ./backend
+# Copy frontend source code only
 COPY frontend ./frontend
 
 ARG VITE_API_URL
