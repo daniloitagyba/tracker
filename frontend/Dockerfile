@@ -1,34 +1,33 @@
-# Build stage
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
+FROM base AS builder
 WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install --legacy-peer-deps
-
-# Copy source code
 COPY . .
-
-# Receive API URL as build argument
+RUN pnpm install --frozen-lockfile
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
+RUN pnpm --filter tracker-frontend build
 
-# Build
-RUN npm run build
-
-# Production stage
 FROM nginx:alpine AS runner
-
 # Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy built files
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Configure permissions for non-root user
+RUN touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d && \
+    chown -R nginx:nginx /usr/share/nginx/html
 
-# Fly.io uses port 8080 by default
+# Switch to non-root user
+USER nginx
+
+COPY --from=builder /app/frontend/dist /usr/share/nginx/html
+
 EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]

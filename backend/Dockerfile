@@ -1,30 +1,16 @@
-# Build stage
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
+FROM base AS builder
 WORKDIR /app
-
-# Install OpenSSL for Prisma
-RUN apk add --no-cache openssl openssl-dev
-
-# Copy package files
-COPY package*.json ./
-COPY prisma ./prisma/
-
-# Install dependencies
-RUN npm install --legacy-peer-deps
-
-# Generate Prisma client
-RUN npx prisma generate
-
-# Copy source code
 COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter tracker-backend build
+RUN pnpm --filter tracker-backend deploy --prod /app/deployed
 
-# Build
-RUN npm run build
-
-# Production stage
-FROM node:20-alpine AS runner
-
+FROM base AS runner
 WORKDIR /app
 
 # Install dumb-init and OpenSSL for Prisma
@@ -34,24 +20,19 @@ RUN apk add --no-cache dumb-init openssl
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 fastify
 
-# Copy built files
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/prisma ./prisma
+# Copy deployed app
+COPY --from=builder --chown=fastify:nodejs /app/deployed .
+# Copy prisma schema which might not be in the deployed package if not in 'files' list
+COPY --from=builder --chown=fastify:nodejs /app/backend/prisma ./prisma
 
-# Create data directory for SQLite
+# Create data directory for SQLite if needed
 RUN mkdir -p /data && chown -R fastify:nodejs /data
-
-# Change ownership
-RUN chown -R fastify:nodejs /app
 
 USER fastify
 
-# Port can be configured via environment variable
 ENV PORT=10000
 EXPOSE 10000
 
 # Push schema to database and start server
-CMD ["dumb-init", "sh", "-c", "npx prisma db push --skip-generate && npm start"]
-
+# We use 'node dist/server.js' directly instead of npm start to avoid npm overhead
+CMD ["dumb-init", "sh", "-c", "npx prisma db push --skip-generate && node dist/server.js"]

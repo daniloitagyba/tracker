@@ -21,14 +21,14 @@ export async function buildApp() {
       if (!origin) return cb(null, true);
       
       // Allow configured frontend URL and hosting platform domains
-      const allowed = [
+      const allowedPatterns = [
         env.FRONTEND_URL,
         /\.onrender\.com$/,
         /\.fly\.dev$/,
-        /localhost/,
+        /^http:\/\/localhost(:\d+)?$/, // Strict localhost check
       ];
       
-      const isAllowed = allowed.some((pattern) =>
+      const isAllowed = allowedPatterns.some((pattern) =>
         pattern instanceof RegExp ? pattern.test(origin) : pattern === origin
       );
       
