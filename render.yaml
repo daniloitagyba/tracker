@@ -12,10 +12,7 @@ services:
           name: tracker-db
           property: connectionString
       - key: FRONTEND_URL
-        fromService:
-          type: web
-          name: tracker-frontend
-          property: url
+        sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
@@ -34,10 +31,7 @@ services:
     dockerContext: .
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: tracker-backend
-          property: url
+        sync: false
 
 databases:
   - name: tracker-db
