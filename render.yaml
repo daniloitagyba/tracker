@@ -2,7 +2,7 @@ services:
   - type: web
     name: tracker-backend
     runtime: docker
-    dockerFilePath: ./Dockerfile.backend
+    dockerfilePath: ./Dockerfile.backend
     dockerContext: .
     envVars:
       - key: NODE_ENV
@@ -30,7 +30,7 @@ services:
   - type: web
     name: tracker-frontend
     runtime: docker
-    dockerFilePath: ./Dockerfile.frontend
+    dockerfilePath: ./Dockerfile.frontend
     dockerContext: .
     envVars:
       - key: VITE_API_URL
