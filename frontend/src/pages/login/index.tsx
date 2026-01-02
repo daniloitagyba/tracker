@@ -11,7 +11,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useSearchParams } from 'react-router-dom';
 
-export const LoginPage = () => {
+export function LoginPage() {
   const { mutate: login, isLoading } = useLogin();
   const [searchParams] = useSearchParams();
   const error = searchParams.get('error');

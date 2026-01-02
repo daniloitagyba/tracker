@@ -29,7 +29,7 @@ const globalStyles = (
   />
 );
 
-const AppContent = () => {
+function AppContent() {
   const { mode } = useThemeMode();
   const theme = mode === 'dark' ? darkTheme : lightTheme;
 
@@ -83,7 +83,7 @@ const AppContent = () => {
   );
 };
 
-const App = () => {
+function App() {
   return (
     <BrowserRouter>
       <ThemeModeProvider>

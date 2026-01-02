@@ -126,7 +126,7 @@ const RAPIDAPI_HOST = 'correios-rastreamento-de-encomendas.p.rapidapi.com';
  * Track a package using RapidAPI Correios service
  * With 1 minute cache
  */
-export const trackPackage = async (trackingCode: string): Promise<TrackingResponse> => {
+export async function trackPackage(trackingCode: string): Promise<TrackingResponse> {
   const code = trackingCode.toUpperCase().trim();
   
   console.log(`[RapidAPI] Tracking: ${code}`);
@@ -233,7 +233,9 @@ function emptyResponse(code: string): TrackingResponse {
 }
 
 // Export cache stats for monitoring
-export const getCacheStats = () => ({
-  size: cache.size,
-  entries: Array.from(cache.keys()),
-});
+export function getCacheStats() {
+  return {
+    size: cache.size,
+    entries: Array.from(cache.keys()),
+  };
+}

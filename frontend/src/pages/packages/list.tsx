@@ -36,7 +36,7 @@ import {
   getFilterLabel,
 } from '../../utils/packageHelpers';
 
-export const PackageListPage = () => {
+export function PackageListPage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));

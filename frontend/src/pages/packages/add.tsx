@@ -39,7 +39,7 @@ const carriers: CarrierOption[] = [
 
 const TRACKING_CODE_MAX_LENGTH = 13;
 
-export const AddPackagePage = () => {
+export function AddPackagePage() {
   const navigate = useNavigate();
   const [selectedCarrier, setSelectedCarrier] = useState<CarrierType>('correios');
   const [title, setTitle] = useState('');

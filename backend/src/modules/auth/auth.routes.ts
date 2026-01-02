@@ -80,7 +80,7 @@ const getGoogleUser = async (accessToken: string) => {
   return googleUserSchema.parse(data);
 };
 
-export const authRoutes = async (fastify: FastifyInstance) => {
+export async function authRoutes(fastify: FastifyInstance) {
   // Redirect to Google OAuth
   fastify.get('/auth/google', async (_request: FastifyRequest, reply: FastifyReply) => {
     const url = getGoogleAuthUrl();

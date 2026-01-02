@@ -7,7 +7,7 @@ import { authRoutes } from './modules/auth/auth.routes.js';
 import { userRoutes } from './modules/user/user.routes.js';
 import { packageRoutes } from './modules/package/package.routes.js';
 
-export const buildApp = async () => {
+export async function buildApp() {
   const fastify = Fastify({
     logger: {
       level: process.env.NODE_ENV === 'development' ? 'info' : 'warn',

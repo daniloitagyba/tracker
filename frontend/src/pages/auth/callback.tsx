@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { setTokens } from '../../services/api';
 
-export const AuthCallbackPage = () => {
+export function AuthCallbackPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 

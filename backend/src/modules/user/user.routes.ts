@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../lib/prisma.js';
 
-export const userRoutes = async (fastify: FastifyInstance) => {
+export async function userRoutes(fastify: FastifyInstance) {
   // Get current user
   fastify.get(
     '/users/me',

@@ -6,7 +6,7 @@ interface LayoutProps {
   showHeader?: boolean;
 }
 
-export const Layout = ({ children, showHeader = true }: LayoutProps) => {
+export function Layout({ children, showHeader = true }: LayoutProps) {
   return (
     <Box
       sx={{

@@ -20,7 +20,7 @@ interface Identity {
   avatar?: string;
 }
 
-export const Header = () => {
+export function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { data: identity } = useGetIdentity<Identity>();

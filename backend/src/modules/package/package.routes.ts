@@ -10,7 +10,7 @@ import {
   type PackageParams,
 } from '../../schemas/package.schema.js';
 
-export const packageRoutes = async (fastify: FastifyInstance) => {
+export async function packageRoutes(fastify: FastifyInstance) {
   // List all packages for the current user
   fastify.get(
     '/packages',
