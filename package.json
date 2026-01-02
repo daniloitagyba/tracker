@@ -3,18 +3,14 @@
   "version": "1.0.0",
   "description": "Aplicação fullstack para rastreamento de encomendas",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:frontend": "npm run dev --workspace=frontend",
-    "dev:backend": "npm run dev --workspace=backend",
-    "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
-    "build:frontend": "npm run build --workspace=frontend",
-    "build:backend": "npm run build --workspace=backend",
-    "start": "npm run start --workspace=backend",
+    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
+    "dev:frontend": "pnpm --filter tracker-frontend dev",
+    "dev:backend": "pnpm --filter tracker-backend dev",
+    "build": "pnpm --filter tracker-backend build && pnpm --filter tracker-frontend build",
+    "build:frontend": "pnpm --filter tracker-frontend build",
+    "build:backend": "pnpm --filter tracker-backend build",
+    "start": "pnpm --filter tracker-backend start",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"
