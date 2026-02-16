@@ -1,6 +1,6 @@
 import type { AuthTokens } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 const TOKEN_KEY = 'tracker_access_token';
 const REFRESH_TOKEN_KEY = 'tracker_refresh_token';

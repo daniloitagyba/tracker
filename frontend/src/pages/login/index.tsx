@@ -93,7 +93,7 @@ export function LoginPage() {
                     OAuth client was deleted. Please:
                     <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
                       <li>Create a new OAuth client in Google Cloud Console</li>
-                      <li>Add the redirect URI: <code style={{ fontSize: '0.85em' }}>http://localhost:3001/auth/google/callback</code></li>
+                      <li>Add the redirect URI: <code style={{ fontSize: '0.85em' }}>http://localhost:3002/auth/google/callback</code></li>
                       <li>Update the <code style={{ fontSize: '0.85em' }}>backend/.env</code> file with new credentials</li>
                     </ul>
                   </>
@@ -103,7 +103,7 @@ export function LoginPage() {
                   </>
                 ) : decodeURIComponent(error).includes('Redirect URI mismatch') ? (
                   <>
-                    Redirect URI mismatch. Add <code style={{ fontSize: '0.85em' }}>http://localhost:3001/auth/google/callback</code> to authorized URIs in Google Cloud Console.
+                    Redirect URI mismatch. Add <code style={{ fontSize: '0.85em' }}>http://localhost:3002/auth/google/callback</code> to authorized URIs in Google Cloud Console.
                   </>
                 ) : (
                   decodeURIComponent(error)

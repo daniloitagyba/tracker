@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
+import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { env } from './config/env.js';
 import authPlugin from './plugins/auth.plugin.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
@@ -13,6 +14,9 @@ export async function buildApp() {
       level: process.env.NODE_ENV === 'development' ? 'info' : 'warn',
     },
   });
+
+  fastify.setValidatorCompiler(validatorCompiler);
+  fastify.setSerializerCompiler(serializerCompiler);
 
   await fastify.register(cors, {
     origin: (origin, cb) => {

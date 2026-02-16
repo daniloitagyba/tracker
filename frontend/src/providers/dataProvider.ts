@@ -1,7 +1,7 @@
 import type { DataProvider } from '@refinedev/core';
 import { getAccessToken, refreshAccessToken, clearTokens } from '../services/api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 const customFetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
   let accessToken = getAccessToken();

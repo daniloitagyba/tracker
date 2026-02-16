@@ -55,7 +55,7 @@ Fullstack application for tracking postal packages with Google OAuth authenticat
 3. Application type: **Web application**
 4. Name: `Tracker Web Client` (or any name)
 5. **Authorized redirect URIs** (CRITICAL - must be exactly like this):
-   - `http://localhost:3001/auth/google/callback`
+   - `http://localhost:3002/auth/google/callback`
    - ⚠️ **Do not use** `https://` or a different port
    - ⚠️ **Do not add** a trailing slash
 6. Click **Create**
@@ -66,7 +66,7 @@ Fullstack application for tracking postal packages with Google OAuth authenticat
 
 If you receive a "deleted_client" or "invalid_client" error:
 - Check if Client ID and Secret are correct in the `backend/.env` file
-- Verify that the redirect URI is **exactly** `http://localhost:3001/auth/google/callback` in Google Cloud Console
+- Verify that the redirect URI is **exactly** `http://localhost:3002/auth/google/callback` in Google Cloud Console
 - Ensure there are no extra spaces or special characters in the credentials
 
 ---
@@ -114,8 +114,8 @@ pnpm install
 
    # App
    PORT=3001
-   FRONTEND_URL="http://localhost:3000"
-   BACKEND_URL="http://localhost:3001"
+   FRONTEND_URL="http://localhost:3002"
+   BACKEND_URL="http://localhost:3002"
    ```
 
 #### Frontend
@@ -127,7 +127,7 @@ pnpm install
 
 2. The `frontend/.env` file is already correctly configured for localhost:
    ```env
-   VITE_API_URL="http://localhost:3001"
+   VITE_API_URL="http://localhost:3002"
    ```
 
 ### 4. Configure database
@@ -152,7 +152,7 @@ pnpm dev
 ```
 This command will start both services with prefixed and colored logs (`BACKEND` in magenta and `FRONTEND` in cyan).
 
-The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:3001`.
+The frontend will be available at `http://localhost:3002` and the backend at `http://localhost:3002`.
 
 ---
 

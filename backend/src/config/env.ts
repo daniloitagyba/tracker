@@ -8,9 +8,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),
   RAPIDAPI_KEY: z.string(),
-  PORT: z.coerce.number().default(3001),
-  FRONTEND_URL: z.string().default('http://localhost:3000'),
-  BACKEND_URL: z.string().default('http://localhost:3001'),
+  PORT: z.coerce.number().default(3002),
+  FRONTEND_URL: z.string().default('http://localhost:3001'),
+  BACKEND_URL: z.string().default('http://localhost:3002'),
 });
 
 const parsed = envSchema.safeParse(process.env);
