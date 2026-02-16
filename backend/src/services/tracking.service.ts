@@ -15,16 +15,13 @@ export interface TrackingResponse {
   lastUpdate: string | null;
 }
 
-// ============================================
-// Cache Implementation (TTL: 1 minute)
-// ============================================
 interface CacheEntry {
   data: TrackingResponse;
   timestamp: number;
 }
 
 const cache = new Map<string, CacheEntry>();
-const CACHE_TTL_MS = 60 * 1000; // 1 minuto em milissegundos
+const CACHE_TTL_MS = 60 * 1000; 
 
 function getFromCache(code: string): TrackingResponse | null {
   const entry = cache.get(code);
@@ -36,7 +33,6 @@ function getFromCache(code: string): TrackingResponse | null {
   const now = Date.now();
   const age = now - entry.timestamp;
 
-  // Check if cache is still valid
   if (age > CACHE_TTL_MS) {
     cache.delete(code);
     console.log(`[Cache] EXPIRED: ${code} (age: ${Math.round(age / 1000)}s)`);
@@ -55,7 +51,6 @@ function saveToCache(code: string, data: TrackingResponse): void {
   console.log(`[Cache] SAVED: ${code}`);
 }
 
-// Cleanup expired entries periodically (every 5 minutes)
 setInterval(() => {
   const now = Date.now();
   let cleaned = 0;
@@ -72,9 +67,6 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
-// ============================================
-// RapidAPI Correios Tracking Types
-// ============================================
 interface RapidApiEndereco {
   cidade?: string;
   uf?: string;
@@ -117,27 +109,18 @@ interface RapidApiResponse {
   message?: string;
 }
 
-// ============================================
-// RapidAPI Correios Tracking Service
-// ============================================
 const RAPIDAPI_HOST = 'correios-rastreamento-de-encomendas.p.rapidapi.com';
 
-/**
- * Track a package using RapidAPI Correios service
- * With 1 minute cache
- */
 export async function trackPackage(trackingCode: string): Promise<TrackingResponse> {
   const code = trackingCode.toUpperCase().trim();
   
   console.log(`[RapidAPI] Tracking: ${code}`);
 
-  // 1. Check cache first
   const cached = getFromCache(code);
   if (cached) {
     return cached;
   }
 
-  // 2. Fetch from API
   console.log(`[Cache] MISS: ${code} - fetching from API...`);
   
   try {
@@ -158,13 +141,11 @@ export async function trackPackage(trackingCode: string): Promise<TrackingRespon
 
     const data = (await response.json()) as RapidApiResponse;
 
-    // Check for API error
     if (data.error || data.message) {
       console.error(`[RapidAPI] Error: ${data.error || data.message}`);
       return emptyResponse(code);
     }
 
-    // Check if events exist
     if (!data.eventos || data.eventos.length === 0) {
       console.log('[RapidAPI] No events found');
       return emptyResponse(code);
@@ -188,8 +169,8 @@ export async function trackPackage(trackingCode: string): Promise<TrackingRespon
       }
 
       return {
-        date: dateTime.toLocaleDateString('pt-BR'),
-        time: dateTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        date: dateTime.toLocaleDateString('en-US'),
+        time: dateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
         location,
         status: evento.descricaoFrontEnd || evento.descricao,
         description,
@@ -210,10 +191,9 @@ export async function trackPackage(trackingCode: string): Promise<TrackingRespon
       lastUpdate: events[0]?.date || null,
     };
 
-    // 3. Save to cache
     saveToCache(code, result);
 
-    console.log(`[RapidAPI] Success: ${events.length} events | Situação: ${data.situacao} | Delivered: ${isDelivered}`);
+    console.log(`[RapidAPI] Success: ${events.length} events | Situation: ${data.situacao} | Delivered: ${isDelivered}`);
 
     return result;
 
@@ -232,7 +212,6 @@ function emptyResponse(code: string): TrackingResponse {
   };
 }
 
-// Export cache stats for monitoring
 export function getCacheStats() {
   return {
     size: cache.size,

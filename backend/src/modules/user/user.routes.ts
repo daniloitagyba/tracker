@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../../lib/prisma.js';
 
 export async function userRoutes(fastify: FastifyInstance) {
-  // Get current user
+  
   fastify.get(
     '/users/me',
     { preHandler: [fastify.authenticate] },
@@ -28,4 +28,3 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
   );
 };
-

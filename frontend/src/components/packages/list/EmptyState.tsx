@@ -40,14 +40,14 @@ export const EmptyState = ({ variant, filterLabel, onViewAll }: EmptyStateProps)
           gutterBottom
           sx={{ fontWeight: 600 }}
         >
-          Nenhuma encomenda cadastrada
+          No packages registered
         </Typography>
         <Typography
           variant="body2"
           color="text.secondary"
           sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
         >
-          Adicione sua primeira encomenda para começar a rastrear
+          Add your first package to start tracking
         </Typography>
       </Box>
     );
@@ -81,7 +81,7 @@ export const EmptyState = ({ variant, filterLabel, onViewAll }: EmptyStateProps)
         gutterBottom
         sx={{ fontWeight: 500 }}
       >
-        Nenhuma encomenda {filterLabel}
+        No packages {filterLabel}
       </Typography>
       <Typography
         variant="body2"
@@ -94,7 +94,7 @@ export const EmptyState = ({ variant, filterLabel, onViewAll }: EmptyStateProps)
         }}
         onClick={onViewAll}
       >
-        Ver todas as encomendas
+        View all packages
       </Typography>
     </Box>
   );

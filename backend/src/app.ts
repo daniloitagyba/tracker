@@ -14,18 +14,16 @@ export async function buildApp() {
     },
   });
 
-  // Register plugins
   await fastify.register(cors, {
     origin: (origin, cb) => {
-      // Allow requests with no origin (mobile apps, curl, etc.)
+      
       if (!origin) return cb(null, true);
       
-      // Allow configured frontend URL and hosting platform domains
       const allowedPatterns = [
         env.FRONTEND_URL,
         /\.onrender\.com$/,
         /\.fly\.dev$/,
-        /^http:\/\/localhost(:\d+)?$/, // Strict localhost check
+        /^http:\/\/localhost(:\d+)?$/, 
       ];
       
       const isAllowed = allowedPatterns.some((pattern) =>
@@ -40,14 +38,11 @@ export async function buildApp() {
   await fastify.register(cookie);
   await fastify.register(authPlugin);
 
-  // Register routes
   await fastify.register(authRoutes);
   await fastify.register(userRoutes);
   await fastify.register(packageRoutes);
 
-  // Health check
   fastify.get('/health', async () => ({ status: 'ok' }));
 
   return fastify;
 };
-

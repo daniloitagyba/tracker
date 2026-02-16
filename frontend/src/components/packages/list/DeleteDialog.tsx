@@ -57,7 +57,7 @@ export const DeleteDialog = ({
             fontSize: { xs: '1.125rem', sm: '1.25rem' },
           }}
         >
-          Remover Pacote
+          Remove Package
         </Typography>
         <IconButton onClick={onCancel} size="small" disabled={isDeleting}>
           <CloseIcon />
@@ -76,7 +76,7 @@ export const DeleteDialog = ({
             fontSize: { xs: '0.875rem', sm: '1rem' },
           }}
         >
-          Tem certeza que deseja remover o pacote{' '}
+          Are you sure you want to remove the package{' '}
           <strong>{packageToDelete?.description || packageToDelete?.trackingCode}</strong>?
         </Typography>
         <Typography
@@ -86,7 +86,7 @@ export const DeleteDialog = ({
             fontSize: { xs: '0.75rem', sm: '0.875rem' },
           }}
         >
-          Esta ação não pode ser desfeita.
+          This action cannot be undone.
         </Typography>
       </DialogContent>
       <DialogActions
@@ -106,7 +106,7 @@ export const DeleteDialog = ({
             fontWeight: 500,
           }}
         >
-          Cancelar
+          Cancel
         </Button>
         <Button
           onClick={onConfirm}
@@ -122,7 +122,7 @@ export const DeleteDialog = ({
             isDeleting ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : null
           }
         >
-          {isDeleting ? 'Removendo...' : 'Remover'}
+          {isDeleting ? 'Removing...' : 'Remove'}
         </Button>
       </DialogActions>
     </Dialog>

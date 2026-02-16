@@ -3,7 +3,6 @@ import { getAccessToken, refreshAccessToken, clearTokens } from '../services/api
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-// Custom fetch with auth headers
 const customFetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
   let accessToken = getAccessToken();
 
@@ -21,7 +20,6 @@ const customFetch = async <T>(url: string, options: RequestInit = {}): Promise<T
 
   let response = await makeRequest(accessToken);
 
-  // If unauthorized, try to refresh token
   if (response.status === 401 && accessToken) {
     const newTokens = await refreshAccessToken();
     
@@ -39,7 +37,6 @@ const customFetch = async <T>(url: string, options: RequestInit = {}): Promise<T
     throw new Error(error.error || 'Request failed');
   }
 
-  // Handle empty responses (204 No Content)
   if (response.status === 204) {
     return {} as T;
   }
@@ -47,7 +44,6 @@ const customFetch = async <T>(url: string, options: RequestInit = {}): Promise<T
   return response.json();
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const dataProvider: DataProvider = {
   getList: async ({ resource }) => {
     const data = await customFetch<unknown[]>(`/${resource}`);

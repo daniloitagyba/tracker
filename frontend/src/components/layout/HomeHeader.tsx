@@ -75,7 +75,7 @@ export const HomeHeader = () => {
               color: 'text.primary',
             }}
           >
-            Suas Encomendas
+            Your Packages
           </Typography>
         </Box>
       </Box>
@@ -100,7 +100,7 @@ export const HomeHeader = () => {
         )}
       </IconButton>
 
-      {/* Avatar Menu */}
+      {}
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -134,10 +134,9 @@ export const HomeHeader = () => {
           <ListItemIcon>
             <LogoutRoundedIcon fontSize="small" sx={{ color: 'error.main' }} />
           </ListItemIcon>
-          <Typography color="error.main">Sair</Typography>
+          <Typography color="error.main">Logout</Typography>
         </MenuItem>
       </Menu>
     </Box>
   );
 };
-

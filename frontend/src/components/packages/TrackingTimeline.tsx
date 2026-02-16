@@ -58,7 +58,7 @@ export const TrackingTimeline = ({ tracking, description }: TrackingTimelineProp
           }}
         >
           <Typography color="text.secondary">
-            Nenhum evento de rastreamento encontrado.
+            No tracking events found.
           </Typography>
         </Box>
       </Container>
@@ -108,7 +108,7 @@ export const TrackingTimeline = ({ tracking, description }: TrackingTimelineProp
           {tracking.isDelivered && (
             <Chip
               icon={<CheckCircleRoundedIcon />}
-              label="Entregue"
+              label="Delivered"
               color="success"
               size="medium"
               sx={{ borderRadius: 2 }}

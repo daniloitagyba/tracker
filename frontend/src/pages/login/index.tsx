@@ -79,31 +79,31 @@ export function LoginPage() {
             color="text.secondary"
             sx={{ mb: 4 }}
           >
-            Rastreie suas encomendas de forma simples e rápida
+            Track your packages simply and quickly
           </Typography>
 
           {error && (
             <Alert severity="error" sx={{ mb: 3, textAlign: 'left' }}>
               <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                Erro na autenticação
+                Authentication Error
               </Typography>
               <Typography variant="body2" component="div">
                 {decodeURIComponent(error).includes('OAuth client was deleted') ? (
                   <>
-                    O cliente OAuth foi deletado. Por favor:
+                    OAuth client was deleted. Please:
                     <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
-                      <li>Crie um novo cliente OAuth no Google Cloud Console</li>
-                      <li>Adicione a URI de redirecionamento: <code style={{ fontSize: '0.85em' }}>http://localhost:3001/auth/google/callback</code></li>
-                      <li>Atualize o arquivo <code style={{ fontSize: '0.85em' }}>backend/.env</code> com as novas credenciais</li>
+                      <li>Create a new OAuth client in Google Cloud Console</li>
+                      <li>Add the redirect URI: <code style={{ fontSize: '0.85em' }}>http://localhost:3001/auth/google/callback</code></li>
+                      <li>Update the <code style={{ fontSize: '0.85em' }}>backend/.env</code> file with new credentials</li>
                     </ul>
                   </>
                 ) : decodeURIComponent(error).includes('Invalid OAuth client credentials') ? (
                   <>
-                    Credenciais OAuth inválidas. Verifique se <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_ID</code> e <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_SECRET</code> estão corretos no arquivo <code style={{ fontSize: '0.85em' }}>backend/.env</code>.
+                    Invalid OAuth credentials. Check if <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_ID</code> and <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_SECRET</code> are correct in the <code style={{ fontSize: '0.85em' }}>backend/.env</code> file.
                   </>
                 ) : decodeURIComponent(error).includes('Redirect URI mismatch') ? (
                   <>
-                    URI de redirecionamento não corresponde. Adicione <code style={{ fontSize: '0.85em' }}>http://localhost:3001/auth/google/callback</code> às URIs autorizadas no Google Cloud Console.
+                    Redirect URI mismatch. Add <code style={{ fontSize: '0.85em' }}>http://localhost:3001/auth/google/callback</code> to authorized URIs in Google Cloud Console.
                   </>
                 ) : (
                   decodeURIComponent(error)
@@ -131,7 +131,7 @@ export function LoginPage() {
               },
             }}
           >
-            {isLoading ? 'Conectando...' : 'Entrar com Google'}
+            {isLoading ? 'Connecting...' : 'Sign in with Google'}
           </Button>
 
           <Typography
@@ -139,11 +139,10 @@ export function LoginPage() {
             color="text.secondary"
             sx={{ mt: 3, display: 'block' }}
           >
-            Ao entrar, você concorda com nossos termos de uso
+            By signing in, you agree to our terms of use
           </Typography>
         </CardContent>
       </Card>
     </Box>
   );
 };
-

@@ -74,7 +74,6 @@ const baseTheme: ThemeOptions = {
   },
 };
 
-// Primary color: rgb(59, 130, 246) = #3B82F6
 export const darkTheme = createTheme({
   ...baseTheme,
   palette: {

@@ -6,27 +6,21 @@ RUN corepack enable
 FROM base AS builder
 WORKDIR /app
 
-# Copy workspace config files
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY package.json ./
 
-# Copy package.json for workspace
-COPY frontend/package.json ./frontend/
-
-# Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy frontend source code only
-COPY frontend ./frontend
+COPY . .
 
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
-RUN pnpm --filter tracker-frontend build
+
+RUN pnpm build
 
 FROM nginx:alpine AS runner
-# Copy custom nginx config
-COPY --from=builder /app/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Configure permissions for non-root user
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 RUN touch /var/run/nginx.pid && \
     chown -R nginx:nginx /var/run/nginx.pid && \
     chown -R nginx:nginx /var/cache/nginx && \
@@ -34,10 +28,9 @@ RUN touch /var/run/nginx.pid && \
     chown -R nginx:nginx /etc/nginx/conf.d && \
     chown -R nginx:nginx /usr/share/nginx/html
 
-# Switch to non-root user
 USER nginx
 
-COPY --from=builder /app/frontend/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 8080
 

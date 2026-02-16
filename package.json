@@ -1,10 +1,10 @@
 {
   "name": "tracker",
   "version": "1.0.0",
-  "description": "Aplicação fullstack para rastreamento de encomendas",
+  "description": "Fullstack application for package tracking",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\"",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"magenta,cyan\" \"pnpm dev:backend\" \"pnpm dev:frontend\"",
     "dev:frontend": "pnpm --filter tracker-frontend dev",
     "dev:backend": "pnpm --filter tracker-backend dev",
     "build": "pnpm --filter tracker-backend build && pnpm --filter tracker-frontend build",

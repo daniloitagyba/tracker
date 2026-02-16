@@ -68,11 +68,11 @@ export function PackageListPage() {
   } = usePackageDelete({
     onSuccess: async () => {
       closeTracking();
-      showSuccess('Pacote removido com sucesso!');
+      showSuccess('Package removed successfully!');
       await refetch();
     },
     onError: () => {
-      showError('Erro ao remover pacote. Tente novamente.');
+      showError('Error removing package. Please try again.');
     },
   });
 
@@ -80,9 +80,9 @@ export function PackageListPage() {
     onComplete: async ({ successCount, errorCount }) => {
       await refetch();
       if (errorCount === 0) {
-        showSuccess(`Todas as ${successCount} encomendas foram atualizadas com sucesso!`);
+        showSuccess(`All ${successCount} packages were updated successfully!`);
       } else {
-        showError(`${successCount} encomendas atualizadas. ${errorCount} falharam.`);
+        showError(`${successCount} packages updated. ${errorCount} failed.`);
       }
     },
   });
@@ -119,11 +119,11 @@ export function PackageListPage() {
         method: 'GET',
       });
 
-      showSuccess('Pacote atualizado com sucesso!');
+      showSuccess('Package updated successfully!');
       await refetch();
     } catch (error) {
       console.error(`Error updating package ${pkg.trackingCode}:`, error);
-      showError('Erro ao atualizar pacote. Tente novamente.');
+      showError('Error updating package. Please try again.');
     } finally {
       setUpdatingSinglePackageId(null);
     }
@@ -155,7 +155,7 @@ export function PackageListPage() {
               fontWeight: 500,
             }}
           >
-            Carregando encomendas...
+            Loading packages...
           </Typography>
         </Box>
       );
@@ -280,7 +280,7 @@ export function PackageListPage() {
             transform: 'scale(0.95)',
           },
         }}
-        aria-label="Adicionar encomenda"
+        aria-label="Add package"
       >
         <AddRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 } }} />
       </Fab>

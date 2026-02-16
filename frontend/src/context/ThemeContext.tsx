@@ -41,4 +41,3 @@ export const ThemeModeProvider = ({ children }: ThemeModeProviderProps) => {
     </ThemeContext.Provider>
   );
 };
-

@@ -50,7 +50,6 @@ const getGoogleTokens = async (code: string): Promise<GoogleTokenResponse> => {
     const errorData = (await response.json().catch(() => ({}))) as GoogleErrorResponse;
     const errorMessage = errorData.error_description || errorData.error || 'Failed to get Google tokens';
 
-    // Provide specific error messages for common issues
     if (errorData.error === 'deleted_client') {
       throw new Error('OAuth client was deleted. Please create a new OAuth client in Google Cloud Console and update your .env file.');
     }
@@ -81,13 +80,12 @@ const getGoogleUser = async (accessToken: string) => {
 };
 
 export async function authRoutes(fastify: FastifyInstance) {
-  // Redirect to Google OAuth
+  
   fastify.get('/auth/google', async (_request: FastifyRequest, reply: FastifyReply) => {
     const url = getGoogleAuthUrl();
     return reply.redirect(url);
   });
 
-  // Google OAuth callback
   fastify.get(
     '/auth/google/callback',
     async (request: FastifyRequest<{ Querystring: { code?: string; error?: string } }>, reply: FastifyReply) => {
@@ -98,13 +96,11 @@ export async function authRoutes(fastify: FastifyInstance) {
       }
 
       try {
-        // Exchange code for tokens
+        
         const googleTokens = await getGoogleTokens(code);
         
-        // Get user info from Google
         const googleUser = await getGoogleUser(googleTokens.access_token);
 
-        // Create or update user in database
         const user = await prisma.user.upsert({
           where: { googleId: googleUser.id },
           update: {
@@ -120,19 +116,16 @@ export async function authRoutes(fastify: FastifyInstance) {
           },
         });
 
-        // Generate JWT tokens
         const tokens = await generateTokens(fastify, {
           userId: user.id,
           email: user.email,
         });
 
-        // Save refresh token
         await prisma.user.update({
           where: { id: user.id },
           data: { refreshToken: tokens.refreshToken },
         });
 
-        // Redirect to frontend with tokens
         const params = new URLSearchParams({
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
@@ -142,14 +135,13 @@ export async function authRoutes(fastify: FastifyInstance) {
       } catch (err) {
         console.error('Auth error:', err);
         const errorMessage = err instanceof Error ? err.message : 'auth_failed';
-        // URL encode the error message to pass it safely
+        
         const encodedError = encodeURIComponent(errorMessage);
         return reply.redirect(`${env.FRONTEND_URL}/login?error=${encodedError}`);
       }
     }
   );
 
-  // Refresh token endpoint
   fastify.post(
     '/auth/refresh',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -165,7 +157,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         return reply.status(401).send({ error: 'Invalid refresh token' });
       }
 
-      // Verify refresh token exists in database
       const user = await prisma.user.findUnique({
         where: { id: decoded.userId },
       });
@@ -174,13 +165,11 @@ export async function authRoutes(fastify: FastifyInstance) {
         return reply.status(401).send({ error: 'Invalid refresh token' });
       }
 
-      // Generate new tokens
       const tokens = await generateTokens(fastify, {
         userId: user.id,
         email: user.email,
       });
 
-      // Update refresh token in database
       await prisma.user.update({
         where: { id: user.id },
         data: { refreshToken: tokens.refreshToken },
@@ -190,7 +179,6 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   );
 
-  // Logout endpoint
   fastify.post(
     '/auth/logout',
     { preHandler: [fastify.authenticate] },
@@ -206,4 +194,3 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   );
 };
-

@@ -48,17 +48,16 @@ const formatTimeAgo = (dateString?: string | null): string | null => {
   const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
   const diffInDays = Math.floor(diffInHours / 24);
 
-  if (diffInHours < 1) return 'há alguns minutos';
-  if (diffInHours < 24) return `há cerca de ${diffInHours} horas`;
-  if (diffInDays === 1) return 'há 1 dia';
-  return `há ${diffInDays} dias`;
+  if (diffInHours < 1) return 'a few minutes ago';
+  if (diffInHours < 24) return `about ${diffInHours} hours ago`;
+  if (diffInDays === 1) return '1 day ago';
+  return `${diffInDays} days ago`;
 };
 
 export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: PackageCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
-  // Determine status based on isDelivered or fallback
   const status: PackageStatus = pkg.isDelivered ? 'delivered' : (pkg.status || 'in_transit');
   const config = statusConfig[status] || statusConfig.in_transit;
   
@@ -160,7 +159,7 @@ export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: Pack
           </Box>
         )}
 
-        {/* Show location or time info */}
+        {}
         <Box
           sx={{
             display: 'flex',
@@ -207,7 +206,7 @@ export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: Pack
                 fontSize: { xs: '0.65rem', sm: '0.75rem' },
               }}
             >
-              Encomenda não localizada
+              Package not found
             </Typography>
           )}
         </Box>
@@ -253,7 +252,7 @@ export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: Pack
                 color: 'text.disabled',
               },
             }}
-            aria-label="Atualizar pacote"
+            aria-label="Update package"
           >
             {isUpdating ? (
               <CircularProgress size={16} sx={{ color: 'inherit' }} />

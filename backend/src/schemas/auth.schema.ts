@@ -14,4 +14,3 @@ export const googleUserSchema = z.object({
 });
 
 export type GoogleUser = z.infer<typeof googleUserSchema>;
-

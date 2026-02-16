@@ -9,7 +9,7 @@ import type { User } from '../types';
 
 export const authProvider: AuthProvider = {
   login: async () => {
-    // Redirect to Google OAuth
+    
     window.location.href = getGoogleAuthUrl();
     return {
       success: true,
@@ -20,7 +20,7 @@ export const authProvider: AuthProvider = {
     try {
       await apiRequest('/auth/logout', { method: 'POST' });
     } catch {
-      // Continue with logout even if API call fails
+      
     }
     
     clearTokens();
@@ -84,4 +84,3 @@ export const authProvider: AuthProvider = {
     return { error };
   },
 };
-

@@ -106,7 +106,7 @@ export const StatsCard = ({
       <StatItem
         icon={<LocalShippingRoundedIcon fontSize="inherit" />}
         value={inTransit}
-        label="Em Trânsito"
+        label="In Transit"
         color="#3B82F6"
         isMobile={isMobile}
         isActive={activeFilter === 'in_transit'}
@@ -115,7 +115,7 @@ export const StatsCard = ({
       <StatItem
         icon={<CheckCircleRoundedIcon fontSize="inherit" />}
         value={delivered}
-        label="Entregues"
+        label="Delivered"
         color="#10B981"
         isMobile={isMobile}
         isActive={activeFilter === 'delivered'}
@@ -133,4 +133,3 @@ export const StatsCard = ({
     </Box>
   );
 };
-

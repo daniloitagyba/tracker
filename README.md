@@ -1,8 +1,8 @@
-# Tracker - Rastreamento de Encomendas
+# Tracker - Package Tracking
 
-Aplicação fullstack para rastreamento de encomendas postais com autenticação via Google OAuth.
+Fullstack application for tracking postal packages with Google OAuth authentication.
 
-## Tecnologias
+## Technologies
 
 ### Frontend
 - React 18+
@@ -18,99 +18,99 @@ Aplicação fullstack para rastreamento de encomendas postais com autenticação
 - Zod
 - JWT + Refresh Token
 
-### Infraestrutura
+### Infrastructure
 - Docker
 - Docker Compose
 
 ---
 
-## Pré-requisitos
+## Prerequisites
 
 - Node.js 18+
-- npm ou yarn
-- Docker e Docker Compose (opcional, para deploy)
+- npm, yarn or pnpm
+- Docker and Docker Compose (optional, for deployment)
 
 ---
 
-## Configuração do Google OAuth
+## Google OAuth Configuration
 
-⚠️ **IMPORTANTE**: Para desenvolvimento local, você precisa criar um cliente OAuth no Google Cloud Console.
+⚠️ **IMPORTANT**: For local development, you need to create an OAuth client in the Google Cloud Console.
 
-### 1. Criar projeto no Google Cloud Console
+### 1. Create a project in Google Cloud Console
 
-1. Acesse [Google Cloud Console](https://console.cloud.google.com/)
-2. Crie um novo projeto ou selecione um existente
-3. No menu lateral, vá em **APIs e Serviços** > **Tela de consentimento OAuth**
-4. Configure a tela de consentimento:
-   - Tipo de usuário: **Externo** (ou Interno se for G Suite)
-   - Nome do app: `Tracker`
-   - Email de suporte: seu email
-   - Adicione os escopos: `email`, `profile`, `openid`
-   - Salve e continue
+1. Access [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. In the side menu, go to **APIs & Services** > **OAuth consent screen**
+4. Configure the consent screen:
+   - User Type: **External** (or Internal if G Suite)
+   - App name: `Tracker`
+   - Support email: your email
+   - Add scopes: `email`, `profile`, `openid`
+   - Save and continue
 
-### 2. Criar credenciais OAuth 2.0
+### 2. Create OAuth 2.0 Credentials
 
-1. Vá em **APIs e Serviços** > **Credenciais**
-2. Clique em **Criar credenciais** > **ID do cliente OAuth**
-3. Tipo de aplicativo: **Aplicativo da Web**
-4. Nome: `Tracker Web Client` (ou qualquer nome)
-5. **URIs de redirecionamento autorizados** (CRÍTICO - deve ser exatamente assim):
+1. Go to **APIs & Services** > **Credentials**
+2. Click **Create Credentials** > **OAuth client ID**
+3. Application type: **Web application**
+4. Name: `Tracker Web Client` (or any name)
+5. **Authorized redirect URIs** (CRITICAL - must be exactly like this):
    - `http://localhost:3001/auth/google/callback`
-   - ⚠️ **Não use** `https://` ou porta diferente
-   - ⚠️ **Não adicione** barra no final
-6. Clique em **Criar**
-7. Copie o **Client ID** e **Client Secret**
-8. Cole-os no arquivo `backend/.env` (veja seção de instalação abaixo)
+   - ⚠️ **Do not use** `https://` or a different port
+   - ⚠️ **Do not add** a trailing slash
+6. Click **Create**
+7. Copy the **Client ID** and **Client Secret**
+8. Paste them into the `backend/.env` file (see installation section below)
 
-### 3. Verificar configuração
+### 3. Verify Configuration
 
-Se você receber o erro "deleted_client" ou "invalid_client":
-- Verifique se o Client ID e Secret estão corretos no arquivo `backend/.env`
-- Verifique se a URI de redirecionamento está **exatamente** como `http://localhost:3001/auth/google/callback` no Google Cloud Console
-- Certifique-se de que não há espaços extras ou caracteres especiais nas credenciais
+If you receive a "deleted_client" or "invalid_client" error:
+- Check if Client ID and Secret are correct in the `backend/.env` file
+- Verify that the redirect URI is **exactly** `http://localhost:3001/auth/google/callback` in Google Cloud Console
+- Ensure there are no extra spaces or special characters in the credentials
 
 ---
 
-## Instalação
+## Installation
 
-### 1. Clonar o repositório
+### 1. Clone the repository
 
 ```bash
 git clone <repo-url>
 cd tracker
 ```
 
-### 2. Instalar dependências
+### 2. Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
-### 3. Configurar variáveis de ambiente
+### 3. Configure environment variables
 
 #### Backend
 
-1. Copie o arquivo de exemplo:
+1. Copy the example file:
    ```bash
    cp backend/.env.example backend/.env
    ```
 
-2. Edite o arquivo `backend/.env` e preencha com suas credenciais:
+2. Edit the `backend/.env` file and fill in your credentials:
    ```env
    # Database
-   DATABASE_URL="file:./dev.db"
+   DATABASE_URL="file:./prisma/dev.db"
 
-   # Google OAuth (obrigatório - veja seção de configuração acima)
-   GOOGLE_CLIENT_ID="seu_client_id_aqui"
-   GOOGLE_CLIENT_SECRET="seu_client_secret_aqui"
+   # Google OAuth (required - see configuration section above)
+   GOOGLE_CLIENT_ID="your_client_id_here"
+   GOOGLE_CLIENT_SECRET="your_client_secret_here"
 
-   # JWT (gere strings aleatórias de pelo menos 32 caracteres)
-   # Você pode gerar com: openssl rand -base64 32
-   JWT_SECRET="sua_chave_secreta_jwt_min_32_chars"
-   JWT_REFRESH_SECRET="sua_chave_refresh_jwt_min_32_chars"
+   # JWT (generate random strings of at least 32 characters)
+   # You can generate one with: openssl rand -base64 32
+   JWT_SECRET="your_jwt_secret_key_min_32_chars"
+   JWT_REFRESH_SECRET="your_jwt_refresh_secret_key_min_32_chars"
 
    # RapidAPI (Correios Tracking)
-   RAPIDAPI_KEY="sua_rapidapi_key_aqui"
+   RAPIDAPI_KEY="your_rapidapi_key_here"
 
    # App
    PORT=3001
@@ -120,17 +120,17 @@ npm install
 
 #### Frontend
 
-1. Copie o arquivo de exemplo:
+1. Copy the example file:
    ```bash
    cp frontend/.env.example frontend/.env
    ```
 
-2. O arquivo `frontend/.env` já está configurado corretamente para localhost:
+2. The `frontend/.env` file is already correctly configured for localhost:
    ```env
    VITE_API_URL="http://localhost:3001"
    ```
 
-### 4. Configurar banco de dados
+### 4. Configure database
 
 ```bash
 cd backend
@@ -140,92 +140,84 @@ npx prisma db push
 
 ---
 
-## Executando em Desenvolvimento
+## Running in Development
 
-### Opção 1: Executar separadamente
+The project uses `pnpm` workspaces and `concurrently` for easier local execution.
 
+### Start Frontend and Backend simultaneously (Recommended)
+
+In the project root, run:
 ```bash
-# Terminal 1 - Backend
-cd backend
-npm run dev
-
-# Terminal 2 - Frontend
-cd frontend
-npm run dev
+pnpm dev
 ```
+This command will start both services with prefixed and colored logs (`BACKEND` in magenta and `FRONTEND` in cyan).
 
-### Opção 2: Executar com concurrently (na raiz)
-
-```bash
-npm run dev
-```
-
-O frontend estará disponível em `http://localhost:3000` e o backend em `http://localhost:3001`.
+The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:3001`.
 
 ---
 
-## Executando com Docker
+## Running with Docker
 
-### 1. Criar arquivo de variáveis de ambiente
+### 1. Create environment variables file
 
-Crie o arquivo `.env` na raiz do projeto:
+Create the `.env` file in the project root:
 
 ```env
-GOOGLE_CLIENT_ID="seu_client_id_aqui"
-GOOGLE_CLIENT_SECRET="seu_client_secret_aqui"
-JWT_SECRET="sua_chave_secreta_jwt_min_32_chars"
-JWT_REFRESH_SECRET="sua_chave_refresh_jwt_min_32_chars"
-RAPIDAPI_KEY="sua_rapidapi_key_aqui"
+GOOGLE_CLIENT_ID="your_client_id_here"
+GOOGLE_CLIENT_SECRET="your_client_secret_here"
+JWT_SECRET="your_jwt_secret_key_min_32_chars"
+JWT_REFRESH_SECRET="your_jwt_refresh_secret_key_min_32_chars"
+RAPIDAPI_KEY="your_rapidapi_key_here"
 ```
 
-### 2. Build e execução
+### 2. Build and execution
 
 ```bash
 # Build
 docker-compose build
 
-# Executar
+# Run
 docker-compose up -d
 
-# Ver logs
+# View logs
 docker-compose logs -f
 
-# Parar
+# Stop
 docker-compose down
 ```
 
 ---
 
-## Estrutura do Projeto
+## Project Structure
 
 ```
 tracker/
-├── frontend/                 # Aplicação React
+├── frontend/                 # React Application
 │   ├── src/
-│   │   ├── components/       # Componentes reutilizáveis
-│   │   ├── pages/            # Páginas da aplicação
+│   │   ├── components/       # Reusable components
+│   │   ├── pages/            # Application pages
 │   │   ├── providers/        # Providers (auth, data)
-│   │   ├── services/         # Serviços de API
-│   │   └── types/            # Definições de tipos
+│   │   ├── services/         # API services
+│   │   └── types/            # Type definitions
 │   ├── package.json
 │   └── vite.config.ts
-├── backend/                  # API Fastify
+├── backend/                  # Fastify API
 │   ├── src/
-│   │   ├── config/           # Configurações
-│   │   ├── lib/              # Instâncias de libs
-│   │   ├── modules/          # Módulos de domínio
-│   │   │   ├── auth/         # Autenticação
-│   │   │   ├── user/         # Usuários
-│   │   │   └── package/      # Encomendas
-│   │   ├── plugins/          # Plugins Fastify
-│   │   ├── schemas/          # Schemas Zod
-│   │   ├── services/         # Serviços externos
-│   │   └── utils/            # Utilitários
+│   │   ├── config/           # Configurations
+│   │   ├── lib/              # Library instances
+│   │   ├── modules/          # Domain modules
+│   │   │   ├── auth/         # Authentication
+│   │   │   ├── user/         # Users
+│   │   │   └── package/      # Packages
+│   │   ├── plugins/          # Fastify plugins
+│   │   ├── schemas/          # Zod schemas
+│   │   ├── services/         # External services
+│   │   └── utils/            # Utilities
 │   ├── prisma/
 │   │   └── schema.prisma
 │   └── package.json
 ├── docker-compose.yml
-├── agents.md                 # Decisões arquiteturais
+├── agents.md                 # Architectural decisions
 └── README.md
 ```
 
@@ -233,35 +225,34 @@ tracker/
 
 ## API Endpoints
 
-| Método | Rota | Autenticação | Descrição |
+| Method | Route | Authentication | Description |
 |--------|------|--------------|-----------|
-| GET | `/auth/google` | Não | Inicia fluxo OAuth |
-| GET | `/auth/google/callback` | Não | Callback OAuth |
-| POST | `/auth/refresh` | Não | Renova token |
-| POST | `/auth/logout` | Sim | Logout |
-| GET | `/users/me` | Sim | Dados do usuário |
-| GET | `/packages` | Sim | Lista encomendas |
-| POST | `/packages` | Sim | Cria encomenda |
-| GET | `/packages/:id` | Sim | Detalhes |
-| PUT | `/packages/:id` | Sim | Atualiza |
-| DELETE | `/packages/:id` | Sim | Remove |
-| GET | `/packages/:id/track` | Sim | Rastreia |
-| GET | `/health` | Não | Health check |
+| GET | `/auth/google` | No | Starts OAuth flow |
+| GET | `/auth/google/callback` | No | OAuth callback |
+| POST | `/auth/refresh` | No | Renews token |
+| POST | `/auth/logout` | Yes | Logout |
+| GET | `/users/me` | Yes | User data |
+| GET | `/packages` | Yes | List packages |
+| POST | `/packages` | Yes | Create package |
+| GET | `/packages/:id` | Yes | Details |
+| PUT | `/packages/:id` | Yes | Update |
+| DELETE | `/packages/:id` | Yes | Remove |
+| GET | `/packages/:id/track` | Yes | Track package |
+| GET | `/health` | No | Health check |
 
 ---
 
-## Funcionalidades
+## Features
 
-- [x] Autenticação com Google OAuth
-- [x] CRUD de encomendas
-- [x] Rastreamento via RapidAPI (Correios)
-- [x] Interface responsiva
-- [x] Timeline de rastreamento
-- [x] JWT com Refresh Token
+- [x] Google OAuth Authentication
+- [x] Package CRUD
+- [x] Tracking via RapidAPI (Correios)
+- [x] Responsive Interface
+- [x] Tracking Timeline
+- [x] JWT with Refresh Token
 
 ---
 
-## Licença
+## License
 
 MIT
-

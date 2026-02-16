@@ -74,7 +74,6 @@ export const apiRequest = async <T>(
 
   let response = await makeRequest(accessToken);
 
-  // If unauthorized, try to refresh token
   if (response.status === 401 && accessToken) {
     const newTokens = await refreshAccessToken();
     
@@ -90,7 +89,6 @@ export const apiRequest = async <T>(
     throw new Error(error.error || 'Request failed');
   }
 
-  // Handle empty responses (204 No Content)
   if (response.status === 204) {
     return undefined as T;
   }
@@ -101,4 +99,3 @@ export const apiRequest = async <T>(
 export const getGoogleAuthUrl = (): string => {
   return `${API_URL}/auth/google`;
 };
-

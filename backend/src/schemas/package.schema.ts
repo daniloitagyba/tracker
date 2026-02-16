@@ -17,4 +17,3 @@ export const packageParamsSchema = z.object({
 export type CreatePackageInput = z.infer<typeof createPackageSchema>;
 export type UpdatePackageInput = z.infer<typeof updatePackageSchema>;
 export type PackageParams = z.infer<typeof packageParamsSchema>;
-
