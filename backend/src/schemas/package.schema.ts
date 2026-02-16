@@ -3,11 +3,13 @@ import { z } from 'zod';
 export const createPackageSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   trackingCode: z.string().min(1, 'Tracking code is required'),
+  carrier: z.string().optional(),
 });
 
 export const updatePackageSchema = z.object({
   description: z.string().min(1, 'Description is required').optional(),
   trackingCode: z.string().min(1, 'Tracking code is required').optional(),
+  carrier: z.string().optional(),
 });
 
 export const packageParamsSchema = z.object({

@@ -21,9 +21,10 @@ export class PackageService {
   }
 
   async createPackage(userId: string, data: CreatePackageInput) {
+    const { carrier, ...prismaData } = data;
     let pkg = await prisma.package.create({
       data: {
-        ...data,
+        ...prismaData,
         userId,
       },
     });
@@ -59,9 +60,10 @@ export class PackageService {
       return null;
     }
 
+    const { carrier, ...prismaData } = data;
     return prisma.package.update({
       where: { id },
-      data,
+      data: prismaData,
     });
   }
 
