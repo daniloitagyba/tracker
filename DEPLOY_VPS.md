@@ -106,7 +106,8 @@ If you don't want to configure Nginx yet, you can use a simple static server for
 sudo npm install -g serve
 
 # Start Backend
-pm2 start backend/dist/server.js --name "tracker-api"
+cd backend
+pm2 start npm --name "tracker-api" -- start
 
 # Start Frontend on a different port (e.g., 3000)
 pm2 start "serve -s frontend/dist -l 3001" --name "tracker-web"
@@ -125,42 +126,3 @@ pm2 startup
 ## 7. Cloudflare Tunnel (Connector) Setup via GUI
 
 Using Cloudflare Tunnel is more secure as it creates an outbound connection to Cloudflare, meaning you **don't** need to open any ports in your VPS firewall.
-
-### 1. Install Cloudflared on VPS
-Follow the instructions on the Cloudflare dashboard, or run:
-```bash
-curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-sudo dpkg -i cloudflared.deb
-```
-
-### 2. Configure via Cloudflare Zero Trust Dashboard
-1. Go to **Zero Trust Dashboard** > **Networks** > **Tunnels**.
-2. Click **Add a tunnel** and select **Cloudflared**.
-3. Name your tunnel (e.g., `tracker-vps`) and Save.
-4. Under **Install connector**, copy the command for your OS (Linux) and run it on your VPS. It will look like:
-   `sudo cloudflared service install <TOKEN>`
-5. Once the connector shows as **Healthy** in the dashboard, click **Next**.
-
-### 3. Route Traffic (Public Hostnames)
-Add two hostnames to your tunnel:
-
-| Service | Public Hostname | Service Type | URL (Internal) |
-| :--- | :--- | :--- | :--- |
-| **Frontend** | `tracker.yourdomain.com` | `http` | `localhost:3002` (or `80` if using Nginx) |
-| **Backend** | `api-tracker.yourdomain.com` | `http` | `localhost:8080` |
-
-### 4. Update Frontend Environment Variables
-Don't forget to rebuild your frontend with the new public API URL:
-1. Update `frontend/.env`: `VITE_API_URL="https://api-tracker.yourdomain.com"`
-2. Run `pnpm build` again.
-3. Deploy the new `dist` folder.
-
-## 8. Security (UFW)
-
-Since you are using Cloudflare Tunnel, you can keep your firewall tight:
-
-```bash
-sudo ufw default deny incoming
-sudo ufw allow ssh
-sudo ufw enable
-```
