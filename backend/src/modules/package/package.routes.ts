@@ -4,6 +4,9 @@ import {
   createPackageSchema,
   updatePackageSchema,
   packageParamsSchema,
+  CreatePackageInput,
+  UpdatePackageInput,
+  PackageParams,
 } from '../../schemas/package.schema.js';
 
 export async function packageRoutes(fastify: FastifyInstance) {
@@ -15,7 +18,7 @@ export async function packageRoutes(fastify: FastifyInstance) {
     controller.list
   );
 
-  fastify.get(
+  fastify.get<{ Params: PackageParams }>(
     '/packages/:id',
     { 
       preHandler: [fastify.authenticate],
@@ -24,7 +27,7 @@ export async function packageRoutes(fastify: FastifyInstance) {
     controller.get
   );
 
-  fastify.post(
+  fastify.post<{ Body: CreatePackageInput }>(
     '/packages',
     { 
       preHandler: [fastify.authenticate],
@@ -33,7 +36,7 @@ export async function packageRoutes(fastify: FastifyInstance) {
     controller.create
   );
 
-  fastify.put(
+  fastify.put<{ Params: PackageParams; Body: UpdatePackageInput }>(
     '/packages/:id',
     { 
       preHandler: [fastify.authenticate],
@@ -42,7 +45,7 @@ export async function packageRoutes(fastify: FastifyInstance) {
     controller.update
   );
 
-  fastify.delete(
+  fastify.delete<{ Params: PackageParams }>(
     '/packages/:id',
     { 
       preHandler: [fastify.authenticate],
@@ -51,7 +54,7 @@ export async function packageRoutes(fastify: FastifyInstance) {
     controller.delete
   );
 
-  fastify.get(
+  fastify.get<{ Params: PackageParams }>(
     '/packages/:id/track',
     { 
       preHandler: [fastify.authenticate],
