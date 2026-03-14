@@ -7,45 +7,83 @@ on:
 
 jobs:
   deploy:
-    name: Deploy
+    name: Build & Deploy
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter tracker-backend db:generate
+
+      - name: Build backend
+        run: pnpm build:backend
+
+      - name: Build frontend
+        run: pnpm build:frontend
+        env:
+          VITE_API_URL: ${{ secrets.FRONTEND_URL }}
+
       - name: Install cloudflared
         run: |
           curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o cloudflared.deb
           sudo dpkg -i cloudflared.deb
 
-      - name: Setup SSH key
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          cat >> ~/.ssh/config << 'EOF'
+          cat >> ~/.ssh/config << EOF
           Host ${{ secrets.VPS_HOST }}
             ProxyCommand cloudflared access ssh --hostname %h
             StrictHostKeyChecking no
           EOF
 
-      - name: Deploy via SSH
+      - name: Deploy to VPS
         run: |
-          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH'
-            cd ${{ secrets.APP_DIR }}
+          VPS="${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}"
+          APP_DIR="${{ secrets.APP_DIR }}"
 
-            git pull origin main
+          # Create app directories on VPS
+          ssh $VPS "mkdir -p ${APP_DIR}/backend/dist ${APP_DIR}/backend/prisma ${APP_DIR}/backend/node_modules ${APP_DIR}/frontend/dist"
 
-            cat > .env << 'ENVEOF'
+          # Sync backend build
+          rsync -avz --delete -e "ssh" backend/dist/ $VPS:${APP_DIR}/backend/dist/
+          rsync -avz --delete -e "ssh" backend/prisma/ $VPS:${APP_DIR}/backend/prisma/
+          scp backend/package.json $VPS:${APP_DIR}/backend/package.json
+          scp pnpm-lock.yaml $VPS:${APP_DIR}/pnpm-lock.yaml
+
+          # Sync frontend build
+          rsync -avz --delete -e "ssh" frontend/dist/ $VPS:${APP_DIR}/frontend/dist/
+
+          # Create .env on VPS
+          ssh $VPS "cat > ${APP_DIR}/backend/.env << 'ENVEOF'
+          DATABASE_URL=file:./prisma/dev.db
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
           RAPIDAPI_KEY=${{ secrets.RAPIDAPI_KEY }}
+          PORT=3007
           FRONTEND_URL=${{ secrets.FRONTEND_URL }}
           BACKEND_URL=${{ secrets.BACKEND_URL }}
-          ENVEOF
+          NODE_ENV=production
+          ENVEOF"
 
-            docker compose build --no-cache
-            docker compose up -d
-
-            docker image prune -f
-          ENDSSH
+          # Install production deps, run migrations, restart PM2
+          ssh $VPS "cd ${APP_DIR}/backend && npm install --omit=dev && npx prisma db push --skip-generate && pm2 restart tracker-backend || pm2 start dist/server.js --name tracker-backend"
