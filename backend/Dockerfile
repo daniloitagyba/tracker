@@ -31,8 +31,8 @@ COPY --from=builder --chown=fastify:nodejs /app/prisma ./prisma
 
 USER fastify
 
-ENV PORT=10000
+ENV PORT=3007
 ENV NODE_ENV=production
-EXPOSE 10000
+EXPOSE 3007
 
 CMD ["dumb-init", "sh", "-c", "npx prisma db push --skip-generate && node dist/server.js"]

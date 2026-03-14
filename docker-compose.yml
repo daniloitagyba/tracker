@@ -7,13 +7,14 @@ services:
       dockerfile: backend/Dockerfile
     container_name: tracker-backend
     restart: unless-stopped
-    ports:
-      - "3002:3002"
+    expose:
+      - "3007"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=file:/app/prisma/dev.db
-      - PORT=3002
-      - FRONTEND_URL=http://localhost:3001
+      - PORT=3007
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3006}
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:3007}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - JWT_SECRET=${JWT_SECRET}
@@ -24,7 +25,7 @@ services:
     networks:
       - tracker-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3007/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -35,11 +36,11 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
       args:
-        - VITE_API_URL=http://localhost:3002
+        - VITE_API_URL=${FRONTEND_URL:-http://localhost:3006}
     container_name: tracker-frontend
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "8080:8080"
     depends_on:
       backend:
         condition: service_healthy
@@ -53,4 +54,3 @@ networks:
 volumes:
   tracker-data:
     driver: local
-
