@@ -36,7 +36,7 @@ jobs:
       - name: Build frontend
         run: pnpm build:frontend
         env:
-          VITE_API_URL: ${{ secrets.FRONTEND_URL }}
+          VITE_API_URL: /api
 
       - name: Install cloudflared
         run: |
