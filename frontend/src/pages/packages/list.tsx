@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useList } from '@refinedev/core';
+import { useQuery } from '@tanstack/react-query';
 import {
   Box,
   Skeleton,
@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { apiRequest } from '../../services/api';
+import { useQueryClient } from '@tanstack/react-query';
 import type { Package, PackageWithTracking } from '../../types';
 import { PackageCard } from '../../components/packages/PackageCard';
 import { StatsCard, FilterType } from '../../components/packages/StatsCard';
@@ -42,9 +43,11 @@ export function PackageListPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [activeFilter, setActiveFilter] = useState<FilterType>('in_transit');
   const [updatingSinglePackageId, setUpdatingSinglePackageId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const { data, isLoading, refetch } = useList<Package>({
-    resource: 'packages',
+  const { data: packages = [], isLoading, refetch } = useQuery({
+    queryKey: ['packages'],
+    queryFn: () => apiRequest<Package[]>('/packages'),
   });
 
   const { snackbar, showSuccess, showError, closeSnackbar } = useSnackbar();
@@ -68,11 +71,11 @@ export function PackageListPage() {
   } = usePackageDelete({
     onSuccess: async () => {
       closeTracking();
-      showSuccess('Package removed successfully!');
+      showSuccess('Encomenda removida com sucesso!');
       await refetch();
     },
     onError: () => {
-      showError('Error removing package. Please try again.');
+      showError('Erro ao remover encomenda. Tente novamente.');
     },
   });
 
@@ -80,14 +83,13 @@ export function PackageListPage() {
     onComplete: async ({ successCount, errorCount }) => {
       await refetch();
       if (errorCount === 0) {
-        showSuccess(`All ${successCount} packages were updated successfully!`);
+        showSuccess(`Todas as ${successCount} encomendas foram atualizadas com sucesso!`);
       } else {
-        showError(`${successCount} packages updated. ${errorCount} failed.`);
+        showError(`${successCount} atualizadas. ${errorCount} falharam.`);
       }
     },
   });
 
-  const packages = data?.data || [];
   const stats = calculatePackageStats(packages);
   const filteredPackages = filterPackages(packages, activeFilter);
   const inTransitPackages = getInTransitPackages(packages);
@@ -119,11 +121,11 @@ export function PackageListPage() {
         method: 'GET',
       });
 
-      showSuccess('Package updated successfully!');
+      showSuccess('Encomenda atualizada com sucesso!');
       await refetch();
     } catch (error) {
       console.error(`Error updating package ${pkg.trackingCode}:`, error);
-      showError('Error updating package. Please try again.');
+      showError('Erro ao atualizar encomenda. Tente novamente.');
     } finally {
       setUpdatingSinglePackageId(null);
     }
@@ -155,7 +157,7 @@ export function PackageListPage() {
               fontWeight: 500,
             }}
           >
-            Loading packages...
+            Carregando encomendas...
           </Typography>
         </Box>
       );
@@ -280,7 +282,7 @@ export function PackageListPage() {
             transform: 'scale(0.95)',
           },
         }}
-        aria-label="Add package"
+        aria-label="Adicionar encomenda"
       >
         <AddRoundedIcon sx={{ fontSize: { xs: 28, sm: 32 } }} />
       </Fab>
@@ -289,7 +291,7 @@ export function PackageListPage() {
         open={trackingOpen}
         onClose={handleCloseTracking}
         selectedPackage={selectedPackage}
-        trackingData={trackingData?.data}
+        trackingData={trackingData}
         isLoading={isTrackingLoading}
         onDelete={openDeleteDialog}
       />

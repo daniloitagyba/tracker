@@ -41,9 +41,9 @@ export const getInTransitPackages = (packages: Package[]): Package[] => {
 export const getFilterLabel = (filter: FilterType): string => {
   switch (filter) {
     case 'in_transit':
-      return 'in transit';
+      return 'em trânsito';
     case 'delivered':
-      return 'delivered';
+      return 'entregue';
     default:
       return '';
   }

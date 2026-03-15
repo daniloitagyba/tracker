@@ -1,22 +1,15 @@
 import { useState } from 'react';
-import { useGetIdentity, useLogout } from '@refinedev/core';
 import { Box, Typography, Avatar, IconButton, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import { useThemeMode } from '../../context/ThemeContext';
-
-interface Identity {
-  id: string;
-  name: string;
-  avatar?: string;
-}
+import { useAuth } from '../../context/AuthContext';
 
 export const HomeHeader = () => {
-  const { data: identity } = useGetIdentity<Identity>();
+  const { identity, logout } = useAuth();
   const { mode, toggleTheme } = useThemeMode();
-  const { mutate: logout } = useLogout();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -75,7 +68,7 @@ export const HomeHeader = () => {
               color: 'text.primary',
             }}
           >
-            Your Packages
+            Suas Encomendas
           </Typography>
         </Box>
       </Box>
@@ -134,7 +127,7 @@ export const HomeHeader = () => {
           <ListItemIcon>
             <LogoutRoundedIcon fontSize="small" sx={{ color: 'error.main' }} />
           </ListItemIcon>
-          <Typography color="error.main">Logout</Typography>
+          <Typography color="error.main">Sair</Typography>
         </MenuItem>
       </Menu>
     </Box>

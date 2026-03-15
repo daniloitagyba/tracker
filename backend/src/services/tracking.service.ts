@@ -169,8 +169,8 @@ export async function trackPackage(trackingCode: string): Promise<TrackingRespon
       }
 
       return {
-        date: dateTime.toLocaleDateString('en-US'),
-        time: dateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        date: dateTime.toLocaleDateString('pt-BR'),
+        time: dateTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         location,
         status: evento.descricaoFrontEnd || evento.descricao,
         description,

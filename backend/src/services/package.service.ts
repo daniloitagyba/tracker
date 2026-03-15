@@ -36,11 +36,13 @@ export class PackageService {
         const lastEvent = trackingInfo.events[0];
         const eventDate = lastEvent.date ? parseTrackingDate(lastEvent.date, lastEvent.time) : new Date();
         
+        const destination = lastEvent.description?.replace('Destino: ', '') || null;
         pkg = await prisma.package.update({
           where: { id: pkg.id },
           data: {
             lastStatus: lastEvent.status,
             lastLocation: lastEvent.location || null,
+            lastDestination: destination,
             lastUpdate: eventDate,
             isDelivered: trackingInfo.isDelivered,
           },
@@ -94,14 +96,14 @@ export class PackageService {
       const cachedTracking: TrackingResponse = {
         code: pkg.trackingCode,
         events: pkg.lastStatus ? [{
-          date: pkg.lastUpdate ? new Date(pkg.lastUpdate).toLocaleDateString('en-US') : '',
-          time: pkg.lastUpdate ? new Date(pkg.lastUpdate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
+          date: pkg.lastUpdate ? new Date(pkg.lastUpdate).toLocaleDateString('pt-BR') : '',
+          time: pkg.lastUpdate ? new Date(pkg.lastUpdate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '',
           location: pkg.lastLocation || '',
           status: pkg.lastStatus,
-          description: 'Item delivered to recipient',
+          description: 'Objeto entregue ao destinatário',
         }] : [],
         isDelivered: true,
-        lastUpdate: pkg.lastUpdate ? new Date(pkg.lastUpdate).toLocaleDateString('en-US') : null,
+        lastUpdate: pkg.lastUpdate ? new Date(pkg.lastUpdate).toLocaleDateString('pt-BR') : null,
       };
 
       return {
@@ -116,11 +118,13 @@ export class PackageService {
       const lastEvent = trackingInfo.events[0];
       const eventDate = lastEvent.date ? parseTrackingDate(lastEvent.date, lastEvent.time) : new Date();
       
+      const destination = lastEvent.description?.replace('Destino: ', '') || null;
       await prisma.package.update({
         where: { id: pkg.id },
         data: {
           lastStatus: lastEvent.status,
           lastLocation: lastEvent.location || null,
+          lastDestination: destination,
           lastUpdate: eventDate,
           isDelivered: trackingInfo.isDelivered,
         },

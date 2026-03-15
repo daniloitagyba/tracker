@@ -1,4 +1,3 @@
-import { useGetIdentity, useLogout } from '@refinedev/core';
 import {
   AppBar,
   Toolbar,
@@ -13,18 +12,12 @@ import {
 } from '@mui/material';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useState } from 'react';
-
-interface Identity {
-  id: string;
-  name: string;
-  avatar?: string;
-}
+import { useAuth } from '../../context/AuthContext';
 
 export function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { data: identity } = useGetIdentity<Identity>();
-  const { mutate: logout } = useLogout();
+  const { identity, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {

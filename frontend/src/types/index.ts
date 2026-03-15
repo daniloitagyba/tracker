@@ -19,6 +19,7 @@ export interface Package {
   status?: PackageStatus;
   lastStatus?: string;
   lastLocation?: string;
+  lastDestination?: string;
   lastUpdate?: string;
   isDelivered?: boolean;
   createdAt: string;

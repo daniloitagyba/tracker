@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDelete } from '@refinedev/core';
+import { apiRequest } from '../services/api';
 import type { Package } from '../types';
 
 interface UsePackageDeleteOptions {
@@ -11,8 +11,6 @@ export const usePackageDelete = ({ onSuccess, onError }: UsePackageDeleteOptions
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [packageToDelete, setPackageToDelete] = useState<Package | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const { mutate: deletePackage } = useDelete();
 
   const openDeleteDialog = (pkg: Package) => {
     setPackageToDelete(pkg);
@@ -29,25 +27,11 @@ export const usePackageDelete = ({ onSuccess, onError }: UsePackageDeleteOptions
 
     setIsDeleting(true);
     try {
-      await new Promise<void>((resolve, reject) => {
-        deletePackage(
-          {
-            resource: 'packages',
-            id: packageToDelete.id,
-          },
-          {
-            onSuccess: () => {
-              closeDeleteDialog();
-              onSuccess?.();
-              resolve();
-            },
-            onError: (error) => {
-              onError?.(error);
-              reject(error);
-            },
-          }
-        );
-      });
+      await apiRequest(`/packages/${packageToDelete.id}`, { method: 'DELETE' });
+      closeDeleteDialog();
+      onSuccess?.();
+    } catch (error) {
+      onError?.(error);
     } finally {
       setIsDeleting(false);
     }

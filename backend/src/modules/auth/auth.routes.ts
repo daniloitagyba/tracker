@@ -48,19 +48,19 @@ const getGoogleTokens = async (code: string): Promise<GoogleTokenResponse> => {
 
   if (!response.ok) {
     const errorData = (await response.json().catch(() => ({}))) as GoogleErrorResponse;
-    const errorMessage = errorData.error_description || errorData.error || 'Failed to get Google tokens';
+    const errorMessage = errorData.error_description || errorData.error || 'Falha ao obter tokens do Google';
 
     if (errorData.error === 'deleted_client') {
-      throw new Error('OAuth client was deleted. Please create a new OAuth client in Google Cloud Console and update your .env file.');
+      throw new Error('Cliente OAuth foi excluído. Crie um novo cliente OAuth no Google Cloud Console e atualize o arquivo .env.');
     }
     if (errorData.error === 'invalid_client') {
-      throw new Error('Invalid OAuth client credentials. Please check your GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env file.');
+      throw new Error('Credenciais OAuth inválidas. Verifique GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET no arquivo .env.');
     }
     if (errorData.error === 'redirect_uri_mismatch') {
-      throw new Error(`Redirect URI mismatch. Make sure '${env.BACKEND_URL}/auth/google/callback' is added to authorized redirect URIs in Google Cloud Console.`);
+      throw new Error(`URI de redirecionamento incompatível. Certifique-se de que '${env.BACKEND_URL}/auth/google/callback' está nas URIs autorizadas no Google Cloud Console.`);
     }
 
-    throw new Error(`Google OAuth error: ${errorMessage}`);
+    throw new Error(`Erro OAuth do Google: ${errorMessage}`);
   }
 
   return response.json() as Promise<GoogleTokenResponse>;
@@ -72,7 +72,7 @@ const getGoogleUser = async (accessToken: string) => {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to get Google user info');
+    throw new Error('Falha ao obter informações do usuário Google');
   }
 
   const data = await response.json();
@@ -148,13 +148,13 @@ export async function authRoutes(fastify: FastifyInstance) {
       const body = refreshTokenSchema.safeParse(request.body);
 
       if (!body.success) {
-        return reply.status(400).send({ error: 'Invalid request body' });
+        return reply.status(400).send({ error: 'Corpo da requisição inválido' });
       }
 
       const decoded = await verifyRefreshToken(fastify, body.data.refreshToken);
 
       if (!decoded) {
-        return reply.status(401).send({ error: 'Invalid refresh token' });
+        return reply.status(401).send({ error: 'Token de atualização inválido' });
       }
 
       const user = await prisma.user.findUnique({
@@ -162,7 +162,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       });
 
       if (!user || user.refreshToken !== body.data.refreshToken) {
-        return reply.status(401).send({ error: 'Invalid refresh token' });
+        return reply.status(401).send({ error: 'Token de atualização inválido' });
       }
 
       const tokens = await generateTokens(fastify, {
@@ -190,7 +190,7 @@ export async function authRoutes(fastify: FastifyInstance) {
         data: { refreshToken: null },
       });
 
-      return reply.send({ message: 'Logged out successfully' });
+      return reply.send({ message: 'Logout realizado com sucesso' });
     }
   );
 };

@@ -75,7 +75,7 @@ export const TrackingDialog = ({
             fontSize: { xs: '1.125rem', sm: '1.25rem' },
           }}
         >
-          Tracking
+          Rastreamento
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {selectedPackage && onDelete && (
@@ -92,7 +92,7 @@ export const TrackingDialog = ({
                   transform: 'scale(0.9)',
                 },
               }}
-              aria-label="Remove package"
+              aria-label="Remover encomenda"
             >
               <DeleteRoundedIcon />
             </IconButton>
@@ -139,7 +139,7 @@ export const TrackingDialog = ({
               color="text.secondary"
               sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
             >
-              Loading tracking info...
+              Carregando rastreamento...
             </Typography>
           </Box>
         ) : trackingData?.tracking ? (
@@ -157,7 +157,7 @@ export const TrackingDialog = ({
               },
             }}
           >
-            Unable to obtain tracking information.
+            Não foi possível obter informações de rastreamento.
           </Alert>
         )}
       </DialogContent>

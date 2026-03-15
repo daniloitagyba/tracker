@@ -55,8 +55,8 @@ export const UpdateAllButton = ({
         }}
       >
         {isUpdating
-          ? `Updating... (${progress.current}/${progress.total})`
-          : `Update All (${packages.length})`}
+          ? `Atualizando... (${progress.current}/${progress.total})`
+          : `Atualizar Todas (${packages.length})`}
       </Button>
 
       {isUpdating && currentPackage && (
@@ -84,7 +84,7 @@ export const UpdateAllButton = ({
               fontSize: { xs: '0.75rem', sm: '0.875rem' },
             }}
           >
-            Updating: {currentPackage.description || currentPackage.trackingCode}
+            Atualizando: {currentPackage.description || currentPackage.trackingCode}
           </Typography>
         </Box>
       )}

@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
 export const createPackageSchema = z.object({
-  description: z.string().min(1, 'Description is required'),
-  trackingCode: z.string().min(1, 'Tracking code is required'),
+  description: z.string().min(1, 'Descrição é obrigatória'),
+  trackingCode: z.string().min(1, 'Código de rastreio é obrigatório'),
   carrier: z.string().optional(),
 });
 
 export const updatePackageSchema = z.object({
-  description: z.string().min(1, 'Description is required').optional(),
-  trackingCode: z.string().min(1, 'Tracking code is required').optional(),
+  description: z.string().min(1, 'Descrição é obrigatória').optional(),
+  trackingCode: z.string().min(1, 'Código de rastreio é obrigatório').optional(),
   carrier: z.string().optional(),
 });
 

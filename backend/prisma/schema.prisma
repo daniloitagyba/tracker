@@ -26,9 +26,10 @@ model Package {
   trackingCode String
   userId       String
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lastStatus   String?
-  lastLocation String?
-  lastUpdate   DateTime?
+  lastStatus      String?
+  lastLocation    String?
+  lastDestination String?
+  lastUpdate      DateTime?
   isDelivered  Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt

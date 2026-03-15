@@ -1,4 +1,3 @@
-import { useLogin } from '@refinedev/core';
 import {
   Box,
   Button,
@@ -10,14 +9,15 @@ import {
 import GoogleIcon from '@mui/icons-material/Google';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export function LoginPage() {
-  const { mutate: login, isLoading } = useLogin();
+  const { login } = useAuth();
   const [searchParams] = useSearchParams();
   const error = searchParams.get('error');
 
   const handleLogin = () => {
-    login({});
+    login();
   };
 
   return (
@@ -79,31 +79,31 @@ export function LoginPage() {
             color="text.secondary"
             sx={{ mb: 4 }}
           >
-            Track your packages simply and quickly
+            Rastreie suas encomendas de forma simples e rápida
           </Typography>
 
           {error && (
             <Alert severity="error" sx={{ mb: 3, textAlign: 'left' }}>
               <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                Authentication Error
+                Erro de Autenticação
               </Typography>
               <Typography variant="body2" component="div">
                 {decodeURIComponent(error).includes('OAuth client was deleted') ? (
                   <>
-                    OAuth client was deleted. Please:
+                    Cliente OAuth foi excluído. Por favor:
                     <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
-                      <li>Create a new OAuth client in Google Cloud Console</li>
-                      <li>Add the redirect URI: <code style={{ fontSize: '0.85em' }}>http://localhost:3002/auth/google/callback</code></li>
-                      <li>Update the <code style={{ fontSize: '0.85em' }}>backend/.env</code> file with new credentials</li>
+                      <li>Crie um novo cliente OAuth no Google Cloud Console</li>
+                      <li>Adicione a URI de redirecionamento: <code style={{ fontSize: '0.85em' }}>http://localhost:3002/auth/google/callback</code></li>
+                      <li>Atualize o arquivo <code style={{ fontSize: '0.85em' }}>backend/.env</code> com as novas credenciais</li>
                     </ul>
                   </>
                 ) : decodeURIComponent(error).includes('Invalid OAuth client credentials') ? (
                   <>
-                    Invalid OAuth credentials. Check if <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_ID</code> and <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_SECRET</code> are correct in the <code style={{ fontSize: '0.85em' }}>backend/.env</code> file.
+                    Credenciais OAuth inválidas. Verifique se <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_ID</code> e <code style={{ fontSize: '0.85em' }}>GOOGLE_CLIENT_SECRET</code> estão corretos no arquivo <code style={{ fontSize: '0.85em' }}>backend/.env</code>.
                   </>
                 ) : decodeURIComponent(error).includes('Redirect URI mismatch') ? (
                   <>
-                    Redirect URI mismatch. Add <code style={{ fontSize: '0.85em' }}>http://localhost:3002/auth/google/callback</code> to authorized URIs in Google Cloud Console.
+                    URI de redirecionamento incompatível. Adicione <code style={{ fontSize: '0.85em' }}>http://localhost:3002/auth/google/callback</code> às URIs autorizadas no Google Cloud Console.
                   </>
                 ) : (
                   decodeURIComponent(error)
@@ -118,7 +118,7 @@ export function LoginPage() {
             fullWidth
             startIcon={<GoogleIcon />}
             onClick={handleLogin}
-            disabled={isLoading}
+            disabled={false}
             sx={{
               py: 1.5,
               fontSize: '1rem',
@@ -131,7 +131,7 @@ export function LoginPage() {
               },
             }}
           >
-            {isLoading ? 'Connecting...' : 'Sign in with Google'}
+            Entrar com Google
           </Button>
 
           <Typography
@@ -139,7 +139,7 @@ export function LoginPage() {
             color="text.secondary"
             sx={{ mt: 3, display: 'block' }}
           >
-            By signing in, you agree to our terms of use
+            Ao entrar, você concorda com nossos termos de uso
           </Typography>
         </CardContent>
       </Card>

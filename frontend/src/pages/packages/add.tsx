@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCreate } from '@refinedev/core';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box,
   Typography,
@@ -19,6 +19,7 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import { apiRequest } from '../../services/api';
 import type { Package, CarrierType } from '../../types';
 
 interface CarrierOption {
@@ -32,7 +33,7 @@ const carriers: CarrierOption[] = [
   {
     id: 'correios',
     name: 'Correios',
-    country: 'Brazil',
+    country: 'Brasil',
     icon: <Box component="span" sx={{ fontSize: '1.2rem' }}>🇧🇷</Box>,
   },
 ];
@@ -50,7 +51,17 @@ export function AddPackagePage() {
     severity: 'success',
   });
 
-  const { mutate: createPackage, isLoading } = useCreate<Package>();
+  const queryClient = useQueryClient();
+  const { mutate: createPackage, isLoading } = useMutation({
+    mutationFn: (values: { description: string; trackingCode: string; carrier: string }) =>
+      apiRequest<Package>('/packages', {
+        method: 'POST',
+        body: JSON.stringify(values),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['packages'] });
+    },
+  });
 
   const formatTrackingCode = (value: string): string => {
     return value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, TRACKING_CODE_MAX_LENGTH);
@@ -75,31 +86,27 @@ export function AddPackagePage() {
 
   const handleSubmit = () => {
     if (!title.trim()) {
-      setSnackbar({ open: true, message: 'Enter a title for the package', severity: 'error' });
+      setSnackbar({ open: true, message: 'Informe um título para a encomenda', severity: 'error' });
       return;
     }
     if (!isValidTrackingCode) {
-      setSnackbar({ open: true, message: 'Invalid tracking code', severity: 'error' });
+      setSnackbar({ open: true, message: 'Código de rastreio inválido', severity: 'error' });
       return;
     }
 
     createPackage(
       {
-        resource: 'packages',
-        values: {
-          description: title,
-          trackingCode,
-          carrier: selectedCarrier,
-        },
-        invalidates: ['list'],
+        description: title,
+        trackingCode,
+        carrier: selectedCarrier,
       },
       {
         onSuccess: () => {
-          setSnackbar({ open: true, message: 'Package added successfully!', severity: 'success' });
+          setSnackbar({ open: true, message: 'Encomenda adicionada com sucesso!', severity: 'success' });
           setTimeout(() => navigate('/packages'), 1000);
         },
         onError: () => {
-          setSnackbar({ open: true, message: 'Error adding package', severity: 'error' });
+          setSnackbar({ open: true, message: 'Erro ao adicionar encomenda', severity: 'error' });
         },
       }
     );
@@ -139,7 +146,7 @@ export function AddPackagePage() {
         </IconButton>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            Add Tracking
+            Adicionar Rastreio
           </Typography>
           <Link
             href="#"
@@ -156,7 +163,7 @@ export function AddPackagePage() {
             }}
           >
             <OpenInNewRoundedIcon sx={{ fontSize: 16 }} />
-            See Usage Tips
+            Ver Dicas de Uso
           </Link>
         </Box>
       </Box>
@@ -168,7 +175,7 @@ export function AddPackagePage() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <LocalShippingRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Carrier
+              Transportadora
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
@@ -216,12 +223,12 @@ export function AddPackagePage() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <EditRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Package Title
+              Título da Encomenda
             </Typography>
           </Box>
           <TextField
             fullWidth
-            placeholder="Ex: Birthday gift"
+            placeholder="Ex: Presente de aniversário"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             sx={{
@@ -237,7 +244,7 @@ export function AddPackagePage() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <LanguageRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Tracking Code
+              Código de Rastreio
             </Typography>
           </Box>
           <TextField
@@ -295,7 +302,7 @@ export function AddPackagePage() {
                   {parts.letters1 || 'AA'}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  2 letters
+                  2 letras
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -313,7 +320,7 @@ export function AddPackagePage() {
                   {parts.numbers || '123456789'}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  9 numbers
+                  9 números
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -331,7 +338,7 @@ export function AddPackagePage() {
                   {parts.letters2 || 'BB'}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  2 letters
+                  2 letras
                 </Typography>
               </Box>
             </Box>
@@ -389,7 +396,7 @@ export function AddPackagePage() {
             },
           }}
         >
-          {isLoading ? 'Adding...' : 'Add Tracking'}
+          {isLoading ? 'Adicionando...' : 'Adicionar Rastreio'}
         </Button>
       </Box>
 

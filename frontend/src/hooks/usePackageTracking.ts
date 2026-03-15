@@ -1,17 +1,16 @@
 import { useState } from 'react';
-import { useCustom } from '@refinedev/core';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '../services/api';
 import type { PackageWithTracking } from '../types';
 
 export const usePackageTracking = () => {
   const [trackingOpen, setTrackingOpen] = useState(false);
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
 
-  const { data: trackingData, isLoading: isTrackingLoading } = useCustom<PackageWithTracking>({
-    url: `/packages/${selectedPackageId}/track`,
-    method: 'get',
-    queryOptions: {
-      enabled: !!selectedPackageId && trackingOpen,
-    },
+  const { data: trackingData, isLoading: isTrackingLoading } = useQuery({
+    queryKey: ['tracking', selectedPackageId],
+    queryFn: () => apiRequest<PackageWithTracking>(`/packages/${selectedPackageId}/track`),
+    enabled: !!selectedPackageId && trackingOpen,
   });
 
   const openTracking = (packageId: string) => {

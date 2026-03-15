@@ -5,6 +5,7 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded';
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
+import NearMeRoundedIcon from '@mui/icons-material/NearMeRounded';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import type { Package, PackageStatus } from '../../types';
@@ -48,10 +49,10 @@ const formatTimeAgo = (dateString?: string | null): string | null => {
   const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
   const diffInDays = Math.floor(diffInHours / 24);
 
-  if (diffInHours < 1) return 'a few minutes ago';
-  if (diffInHours < 24) return `about ${diffInHours} hours ago`;
-  if (diffInDays === 1) return '1 day ago';
-  return `${diffInDays} days ago`;
+  if (diffInHours < 1) return 'há poucos minutos';
+  if (diffInHours < 24) return `há cerca de ${diffInHours} horas`;
+  if (diffInDays === 1) return 'há 1 dia';
+  return `há ${diffInDays} dias`;
 };
 
 export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: PackageCardProps) => {
@@ -159,7 +160,31 @@ export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: Pack
           </Box>
         )}
 
-        {}
+        {pkg.lastDestination && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.75,
+              mb: 0.75,
+            }}
+          >
+            <NearMeRoundedIcon sx={{ fontSize: { xs: 12, sm: 14 }, color: 'text.secondary' }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'text.secondary',
+                fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Destino: {pkg.lastDestination}
+            </Typography>
+          </Box>
+        )}
+
         <Box
           sx={{
             display: 'flex',
@@ -206,7 +231,7 @@ export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: Pack
                 fontSize: { xs: '0.65rem', sm: '0.75rem' },
               }}
             >
-              Package not found
+              Encomenda não encontrada
             </Typography>
           )}
         </Box>
@@ -252,7 +277,7 @@ export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: Pack
                 color: 'text.disabled',
               },
             }}
-            aria-label="Update package"
+            aria-label="Atualizar encomenda"
           >
             {isUpdating ? (
               <CircularProgress size={16} sx={{ color: 'inherit' }} />

@@ -21,7 +21,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       });
 
       if (!user) {
-        return reply.status(404).send({ error: 'User not found' });
+        return reply.status(404).send({ error: 'Usuário não encontrado' });
       }
 
       return reply.send(user);

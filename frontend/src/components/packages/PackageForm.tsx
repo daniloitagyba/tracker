@@ -63,7 +63,7 @@ export const PackageForm = ({
       }}
     >
       <DialogTitle sx={{ fontWeight: 600 }}>
-        {initialData ? 'Edit Package' : 'New Package'}
+        {initialData ? 'Editar Encomenda' : 'Nova Encomenda'}
       </DialogTitle>
 
       <form onSubmit={handleSubmit(handleFormSubmit)}>
@@ -72,12 +72,12 @@ export const PackageForm = ({
             <Controller
               name="description"
               control={control}
-              rules={{ required: 'Description is required' }}
+              rules={{ required: 'Descrição é obrigatória' }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Description"
-                  placeholder="Ex: iPhone 15 from Amazon"
+                  label="Descrição"
+                  placeholder="Ex: iPhone 15 da Amazon"
                   fullWidth
                   error={!!errors.description}
                   helperText={errors.description?.message}
@@ -90,16 +90,16 @@ export const PackageForm = ({
               name="trackingCode"
               control={control}
               rules={{ 
-                required: 'Tracking code is required',
+                required: 'Código de rastreio é obrigatório',
                 minLength: {
                   value: 5,
-                  message: 'Code must have at least 5 characters',
+                  message: 'Código deve ter no mínimo 5 caracteres',
                 },
               }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Tracking Code"
+                  label="Código de Rastreio"
                   placeholder="Ex: AA361812099BR"
                   fullWidth
                   error={!!errors.trackingCode}
@@ -115,14 +115,14 @@ export const PackageForm = ({
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleClose} color="inherit">
-            Cancel
+            Cancelar
           </Button>
           <Button
             type="submit"
             variant="contained"
             disabled={isLoading}
           >
-            {isLoading ? 'Saving...' : initialData ? 'Save' : 'Add'}
+            {isLoading ? 'Salvando...' : initialData ? 'Salvar' : 'Adicionar'}
           </Button>
         </DialogActions>
       </form>
