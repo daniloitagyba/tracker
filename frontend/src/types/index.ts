@@ -6,9 +6,9 @@ export interface User {
   createdAt: string;
 }
 
-export type PackageStatus = 'pending' | 'in_transit' | 'on_route' | 'delivered';
+export type PackageStatus = 'in_transit' | 'delivered';
 
-export type CarrierType = 'correios' | 'aliexpress';
+export type CarrierType = 'correios';
 
 export interface Package {
   id: string;
@@ -16,7 +16,6 @@ export interface Package {
   trackingCode: string;
   userId: string;
   carrier?: CarrierType;
-  status?: PackageStatus;
   lastStatus?: string;
   lastLocation?: string;
   lastDestination?: string;
@@ -52,7 +51,6 @@ export interface AuthTokens {
 }
 
 export interface PackageStats {
-  onRoute: number;
   inTransit: number;
   delivered: number;
   total: number;

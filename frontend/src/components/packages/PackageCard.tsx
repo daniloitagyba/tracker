@@ -1,7 +1,6 @@
 import { Box, Typography, IconButton, useMediaQuery, useTheme, CircularProgress } from '@mui/material';
 import LocalShippingRoundedIcon from '@mui/icons-material/LocalShippingRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded';
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded';
@@ -9,6 +8,7 @@ import NearMeRoundedIcon from '@mui/icons-material/NearMeRounded';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import type { Package, PackageStatus } from '../../types';
+import { formatTimeAgo } from '../../utils/packageHelpers';
 
 interface PackageCardProps {
   pkg: Package;
@@ -28,39 +28,14 @@ const statusConfig: Record<PackageStatus, { icon: React.ReactNode; color: string
     color: '#10B981',
     bgColor: 'rgba(16, 185, 129, 0.15)',
   },
-  pending: {
-    icon: <WarningAmberRoundedIcon />,
-    color: '#F59E0B',
-    bgColor: 'rgba(245, 158, 11, 0.15)',
-  },
-  on_route: {
-    icon: <LocalShippingRoundedIcon />,
-    color: '#3B82F6',
-    bgColor: 'rgba(59, 130, 246, 0.15)',
-  },
-};
-
-const formatTimeAgo = (dateString?: string | null): string | null => {
-  if (!dateString) return null;
-  
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-  const diffInDays = Math.floor(diffInHours / 24);
-
-  if (diffInHours < 1) return 'há poucos minutos';
-  if (diffInHours < 24) return `há cerca de ${diffInHours} horas`;
-  if (diffInDays === 1) return 'há 1 dia';
-  return `há ${diffInDays} dias`;
 };
 
 export const PackageCard = ({ pkg, onClick, onUpdate, isUpdating = false }: PackageCardProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
-  const status: PackageStatus = pkg.isDelivered ? 'delivered' : (pkg.status || 'in_transit');
-  const config = statusConfig[status] || statusConfig.in_transit;
+  const status: PackageStatus = pkg.isDelivered ? 'delivered' : 'in_transit';
+  const config = statusConfig[status];
   
   const timeAgo = formatTimeAgo(pkg.lastUpdate);
 

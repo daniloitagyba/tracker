@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { env } from './config/env.js';
+import { AppError } from './utils/errors.js';
 import authPlugin from './plugins/auth.plugin.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { userRoutes } from './modules/user/user.routes.js';
@@ -46,7 +47,16 @@ export async function buildApp() {
   await fastify.register(userRoutes);
   await fastify.register(packageRoutes);
 
+  fastify.setErrorHandler((error, _request, reply) => {
+    if (error instanceof AppError) {
+      return reply.status(error.statusCode).send({ error: error.message });
+    }
+
+    fastify.log.error(error);
+    return reply.status(500).send({ error: 'Erro interno do servidor' });
+  });
+
   fastify.get('/health', async () => ({ status: 'ok' }));
 
   return fastify;
-};
+}

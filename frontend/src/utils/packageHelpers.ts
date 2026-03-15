@@ -19,7 +19,7 @@ export const calculatePackageStats = (packages: Package[]): PackageStats => {
       }
       return acc;
     },
-    { onRoute: 0, inTransit: 0, delivered: 0, total: 0 }
+    { inTransit: 0, delivered: 0, total: 0 }
   );
 };
 
@@ -36,6 +36,21 @@ export const filterPackages = (packages: Package[], filter: FilterType): Package
 
 export const getInTransitPackages = (packages: Package[]): Package[] => {
   return packages.filter((pkg) => !pkg.isDelivered);
+};
+
+export const formatTimeAgo = (dateString?: string | null): string | null => {
+  if (!dateString) return null;
+
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInHours < 1) return 'há poucos minutos';
+  if (diffInHours < 24) return `há cerca de ${diffInHours} horas`;
+  if (diffInDays === 1) return 'há 1 dia';
+  return `há ${diffInDays} dias`;
 };
 
 export const getFilterLabel = (filter: FilterType): string => {

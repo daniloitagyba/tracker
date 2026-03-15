@@ -14,8 +14,7 @@ import {
 } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { apiRequest } from '../../services/api';
-import { useQueryClient } from '@tanstack/react-query';
-import type { Package, PackageWithTracking } from '../../types';
+import type { Package } from '../../types';
 import { PackageCard } from '../../components/packages/PackageCard';
 import { StatsCard, FilterType } from '../../components/packages/StatsCard';
 import { Layout } from '../../components/layout/Layout';
@@ -30,6 +29,7 @@ import { usePackageTracking } from '../../hooks/usePackageTracking';
 import { usePackageDelete } from '../../hooks/usePackageDelete';
 import { useBulkUpdate } from '../../hooks/useBulkUpdate';
 import { useSnackbar } from '../../hooks/useSnackbar';
+import { usePackageUpdate } from '../../hooks/usePackageUpdate';
 import {
   calculatePackageStats,
   filterPackages,
@@ -42,8 +42,6 @@ export function PackageListPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [activeFilter, setActiveFilter] = useState<FilterType>('in_transit');
-  const [updatingSinglePackageId, setUpdatingSinglePackageId] = useState<string | null>(null);
-  const queryClient = useQueryClient();
 
   const { data: packages = [], isLoading, refetch } = useQuery({
     queryKey: ['packages'],
@@ -79,6 +77,16 @@ export function PackageListPage() {
     },
   });
 
+  const { updatingPackageId, updatePackage: handleUpdatePackage } = usePackageUpdate({
+    onSuccess: async () => {
+      showSuccess('Encomenda atualizada com sucesso!');
+      await refetch();
+    },
+    onError: () => {
+      showError('Erro ao atualizar encomenda. Tente novamente.');
+    },
+  });
+
   const { isUpdating, progress, currentPackageId, updateAll, getCurrentPackage } = useBulkUpdate({
     onComplete: async ({ successCount, errorCount }) => {
       await refetch();
@@ -111,24 +119,6 @@ export function PackageListPage() {
 
   const handleBulkUpdate = () => {
     updateAll(inTransitPackages);
-  };
-
-  const handleUpdatePackage = async (pkg: Package) => {
-    setUpdatingSinglePackageId(pkg.id);
-
-    try {
-      await apiRequest<PackageWithTracking>(`/packages/${pkg.id}/track`, {
-        method: 'GET',
-      });
-
-      showSuccess('Encomenda atualizada com sucesso!');
-      await refetch();
-    } catch (error) {
-      console.error(`Error updating package ${pkg.trackingCode}:`, error);
-      showError('Erro ao atualizar encomenda. Tente novamente.');
-    } finally {
-      setUpdatingSinglePackageId(null);
-    }
   };
 
   const renderContent = () => {
@@ -236,7 +226,7 @@ export function PackageListPage() {
                   pkg={pkg}
                   onClick={handlePackageClick}
                   onUpdate={handleUpdatePackage}
-                  isUpdating={updatingSinglePackageId === pkg.id}
+                  isUpdating={updatingPackageId === pkg.id}
                 />
               </Box>
             ))}

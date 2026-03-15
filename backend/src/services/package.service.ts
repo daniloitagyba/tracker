@@ -1,9 +1,29 @@
 import { prisma } from '../lib/prisma.js';
 import { trackPackage, TrackingResponse } from './tracking.service.js';
 import { parseTrackingDate } from '../utils/formatters.js';
+import { NotFoundError } from '../utils/errors.js';
 import type { CreatePackageInput, UpdatePackageInput } from '../schemas/package.schema.js';
 
 export class PackageService {
+  private async updatePackageWithTracking(packageId: string, trackingInfo: TrackingResponse) {
+    if (trackingInfo.events.length === 0) return null;
+
+    const lastEvent = trackingInfo.events[0];
+    const eventDate = lastEvent.date ? parseTrackingDate(lastEvent.date, lastEvent.time) : new Date();
+    const destination = lastEvent.description?.replace('Destino: ', '') || null;
+
+    return prisma.package.update({
+      where: { id: packageId },
+      data: {
+        lastStatus: lastEvent.status,
+        lastLocation: lastEvent.location || null,
+        lastDestination: destination,
+        lastUpdate: eventDate,
+        isDelivered: trackingInfo.isDelivered,
+      },
+    });
+  }
+
   async listPackages(userId: string) {
     return prisma.package.findMany({
       where: { userId },
@@ -12,12 +32,18 @@ export class PackageService {
   }
 
   async getPackage(userId: string, id: string) {
-    return prisma.package.findFirst({
+    const pkg = await prisma.package.findFirst({
       where: {
         id,
         userId,
       },
     });
+
+    if (!pkg) {
+      throw new NotFoundError('Encomenda não encontrada');
+    }
+
+    return pkg;
   }
 
   async createPackage(userId: string, data: CreatePackageInput) {
@@ -31,23 +57,8 @@ export class PackageService {
 
     try {
       const trackingInfo = await trackPackage(pkg.trackingCode);
-
-      if (trackingInfo.events.length > 0) {
-        const lastEvent = trackingInfo.events[0];
-        const eventDate = lastEvent.date ? parseTrackingDate(lastEvent.date, lastEvent.time) : new Date();
-        
-        const destination = lastEvent.description?.replace('Destino: ', '') || null;
-        pkg = await prisma.package.update({
-          where: { id: pkg.id },
-          data: {
-            lastStatus: lastEvent.status,
-            lastLocation: lastEvent.location || null,
-            lastDestination: destination,
-            lastUpdate: eventDate,
-            isDelivered: trackingInfo.isDelivered,
-          },
-        });
-      }
+      const updated = await this.updatePackageWithTracking(pkg.id, trackingInfo);
+      if (updated) pkg = updated;
     } catch (error) {
       console.error(`[Initial Track] Failed for ${pkg.trackingCode}:`, error);
     }
@@ -56,11 +67,7 @@ export class PackageService {
   }
 
   async updatePackage(userId: string, id: string, data: UpdatePackageInput) {
-    const existingPkg = await this.getPackage(userId, id);
-
-    if (!existingPkg) {
-      return null;
-    }
+    await this.getPackage(userId, id);
 
     const { carrier, ...prismaData } = data;
     return prisma.package.update({
@@ -70,25 +77,15 @@ export class PackageService {
   }
 
   async deletePackage(userId: string, id: string) {
-    const existingPkg = await this.getPackage(userId, id);
-
-    if (!existingPkg) {
-      return null;
-    }
+    await this.getPackage(userId, id);
 
     await prisma.package.delete({
       where: { id },
     });
-    
-    return true;
   }
 
   async trackPackage(userId: string, id: string) {
     const pkg = await this.getPackage(userId, id);
-
-    if (!pkg) {
-      return null;
-    }
 
     if (pkg.isDelivered) {
       console.log(`[Track] Package ${pkg.trackingCode} already delivered, using cached data`);
@@ -113,27 +110,7 @@ export class PackageService {
     }
 
     const trackingInfo = await trackPackage(pkg.trackingCode);
-
-    if (trackingInfo.events.length > 0) {
-      const lastEvent = trackingInfo.events[0];
-      const eventDate = lastEvent.date ? parseTrackingDate(lastEvent.date, lastEvent.time) : new Date();
-      
-      const destination = lastEvent.description?.replace('Destino: ', '') || null;
-      await prisma.package.update({
-        where: { id: pkg.id },
-        data: {
-          lastStatus: lastEvent.status,
-          lastLocation: lastEvent.location || null,
-          lastDestination: destination,
-          lastUpdate: eventDate,
-          isDelivered: trackingInfo.isDelivered,
-        },
-      });
-    }
-
-    const updatedPkg = await prisma.package.findFirst({
-      where: { id: pkg.id },
-    });
+    const updatedPkg = await this.updatePackageWithTracking(pkg.id, trackingInfo) ?? pkg;
 
     return {
       package: updatedPkg,

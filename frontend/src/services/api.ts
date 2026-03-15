@@ -1,9 +1,7 @@
 import type { AuthTokens } from '../types';
+import { TOKEN_KEY, REFRESH_TOKEN_KEY } from '../config/constants';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3007';
-
-const TOKEN_KEY = 'tracker_access_token';
-const REFRESH_TOKEN_KEY = 'tracker_refresh_token';
 
 export const getAccessToken = (): string | null => {
   return localStorage.getItem(TOKEN_KEY);

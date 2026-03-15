@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { THEME_STORAGE_KEY } from '../config/constants';
 
 type ThemeMode = 'dark' | 'light';
 
@@ -23,12 +24,12 @@ interface ThemeModeProviderProps {
 
 export const ThemeModeProvider = ({ children }: ThemeModeProviderProps) => {
   const [mode, setMode] = useState<ThemeMode>(() => {
-    const savedMode = localStorage.getItem('theme-mode');
+    const savedMode = localStorage.getItem(THEME_STORAGE_KEY);
     return (savedMode as ThemeMode) || 'dark';
   });
 
   useEffect(() => {
-    localStorage.setItem('theme-mode', mode);
+    localStorage.setItem(THEME_STORAGE_KEY, mode);
   }, [mode]);
 
   const toggleTheme = () => {

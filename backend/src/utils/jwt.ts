@@ -1,4 +1,5 @@
 import type { FastifyInstance } from 'fastify';
+import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from '../config/constants.js';
 
 export interface JwtPayload {
   userId: string;
@@ -9,8 +10,8 @@ export const generateTokens = async (
   fastify: FastifyInstance,
   payload: JwtPayload
 ): Promise<{ accessToken: string; refreshToken: string }> => {
-  const accessToken = fastify.jwt.sign(payload, { expiresIn: '15m' });
-  const refreshToken = fastify.jwt.sign(payload, { expiresIn: '7d' });
+  const accessToken = fastify.jwt.sign(payload, { expiresIn: ACCESS_TOKEN_EXPIRY });
+  const refreshToken = fastify.jwt.sign(payload, { expiresIn: REFRESH_TOKEN_EXPIRY });
 
   return { accessToken, refreshToken };
 };

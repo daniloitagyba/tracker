@@ -1,4 +1,5 @@
 import { env } from '../config/env.js';
+import { CACHE_TTL_MS, CACHE_CLEANUP_INTERVAL_MS, RAPIDAPI_HOST } from '../config/constants.js';
 
 export interface TrackingEvent {
   date: string;
@@ -21,7 +22,6 @@ interface CacheEntry {
 }
 
 const cache = new Map<string, CacheEntry>();
-const CACHE_TTL_MS = 60 * 1000; 
 
 function getFromCache(code: string): TrackingResponse | null {
   const entry = cache.get(code);
@@ -65,7 +65,7 @@ setInterval(() => {
   if (cleaned > 0) {
     console.log(`[Cache] Cleanup: removed ${cleaned} expired entries`);
   }
-}, 5 * 60 * 1000);
+}, CACHE_CLEANUP_INTERVAL_MS);
 
 interface RapidApiEndereco {
   cidade?: string;
@@ -108,8 +108,6 @@ interface RapidApiResponse {
   error?: string;
   message?: string;
 }
-
-const RAPIDAPI_HOST = 'correios-rastreamento-de-encomendas.p.rapidapi.com';
 
 export async function trackPackage(trackingCode: string): Promise<TrackingResponse> {
   const code = trackingCode.toUpperCase().trim();
