@@ -55,6 +55,7 @@ export function PackageListPage() {
     selectedPackageId,
     trackingData,
     isTrackingLoading,
+    trackingError,
     openTracking,
     closeTracking,
   } = usePackageTracking();
@@ -283,6 +284,7 @@ export function PackageListPage() {
         selectedPackage={selectedPackage}
         trackingData={trackingData}
         isLoading={isTrackingLoading}
+        error={trackingError instanceof Error ? trackingError : trackingError ? new Error(String(trackingError)) : null}
         onDelete={openDeleteDialog}
       />
 

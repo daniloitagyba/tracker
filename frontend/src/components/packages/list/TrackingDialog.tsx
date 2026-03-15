@@ -21,7 +21,22 @@ interface TrackingDialogProps {
   selectedPackage?: Package;
   trackingData?: PackageWithTracking;
   isLoading: boolean;
+  error?: Error | null;
   onDelete?: (pkg: Package) => void;
+}
+
+function getErrorMessage(error: Error): string {
+  const message = error.message.toLowerCase();
+  if (message.includes('session expired') || message.includes('unauthorized')) {
+    return 'Sua sessão expirou. Faça login novamente.';
+  }
+  if (message.includes('not found')) {
+    return 'Encomenda não encontrada.';
+  }
+  if (message.includes('failed to fetch') || message.includes('network')) {
+    return 'Erro de conexão. Verifique sua internet e tente novamente.';
+  }
+  return 'Não foi possível obter informações de rastreamento. Tente novamente mais tarde.';
 }
 
 export const TrackingDialog = ({
@@ -30,6 +45,7 @@ export const TrackingDialog = ({
   selectedPackage,
   trackingData,
   isLoading,
+  error,
   onDelete,
 }: TrackingDialogProps) => {
   const theme = useTheme();
@@ -142,6 +158,18 @@ export const TrackingDialog = ({
               Carregando rastreamento...
             </Typography>
           </Box>
+        ) : error ? (
+          <Alert
+            severity="error"
+            sx={{
+              mt: { xs: 1, sm: 2 },
+              '& .MuiAlert-message': {
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+              },
+            }}
+          >
+            {getErrorMessage(error)}
+          </Alert>
         ) : trackingData?.tracking ? (
           <TrackingTimeline
             tracking={trackingData.tracking}
