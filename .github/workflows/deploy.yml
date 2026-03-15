@@ -64,7 +64,7 @@ jobs:
 
           # Sync backend build
           rsync -avz --delete -e "ssh" backend/dist/ $VPS:${APP_DIR}/backend/dist/
-          rsync -avz --delete -e "ssh" backend/prisma/ $VPS:${APP_DIR}/backend/prisma/
+          rsync -avz --delete --exclude='*.db' --exclude='*.db-journal' -e "ssh" backend/prisma/ $VPS:${APP_DIR}/backend/prisma/
           scp backend/package.json $VPS:${APP_DIR}/backend/package.json
           scp pnpm-lock.yaml $VPS:${APP_DIR}/pnpm-lock.yaml
 
@@ -90,5 +90,5 @@ jobs:
           scp /tmp/tracker-nginx.conf $VPS:/tmp/tracker-nginx.conf
           ssh $VPS "sudo cp /tmp/tracker-nginx.conf /etc/nginx/sites-available/tracker && sudo ln -sf /etc/nginx/sites-available/tracker /etc/nginx/sites-enabled/tracker && sudo rm -f /etc/nginx/sites-enabled/default && sudo nginx -t && sudo systemctl reload nginx"
 
-          # Install production deps, run migrations, restart PM2
-          ssh $VPS "source ~/.bashrc; source ~/.nvm/nvm.sh 2>/dev/null; source ~/.profile 2>/dev/null; cd ${APP_DIR}/backend && npm install --omit=dev && npx prisma db push --skip-generate && (pm2 restart tracker-backend 2>/dev/null || pm2 start dist/server.js --name tracker-backend)"
+          # Install production deps, sync database schema, generate Prisma client, restart PM2
+          ssh $VPS "source ~/.bashrc; source ~/.nvm/nvm.sh 2>/dev/null; source ~/.profile 2>/dev/null; cd ${APP_DIR}/backend && npm install --omit=dev && npx prisma generate && npx prisma db push --skip-generate && (pm2 restart tracker-backend 2>/dev/null || pm2 start dist/server.js --name tracker-backend)"
