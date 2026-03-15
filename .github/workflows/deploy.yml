@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -86,4 +86,4 @@ jobs:
           ENVEOF"
 
           # Install production deps, run migrations, restart PM2
-          ssh $VPS "cd ${APP_DIR}/backend && npm install --omit=dev && npx prisma db push --skip-generate && pm2 restart tracker-backend || pm2 start dist/server.js --name tracker-backend"
+          ssh $VPS "source ~/.bashrc; source ~/.nvm/nvm.sh 2>/dev/null; source ~/.profile 2>/dev/null; cd ${APP_DIR}/backend && npm install --omit=dev && npx prisma db push --skip-generate && (pm2 restart tracker-backend 2>/dev/null || pm2 start dist/server.js --name tracker-backend)"
